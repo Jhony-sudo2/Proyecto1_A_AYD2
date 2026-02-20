@@ -6,5 +6,4 @@ import com.ayd2.congress.models.User.RolEntity;
 
 public interface RolRepository extends JpaRepository<RolEntity, Long> {
     boolean existByName(String name);
-    boolean existById(Long id);
 }

@@ -62,12 +62,15 @@ public class RolServiceImplTest {
     }
 
     @Test
-    void getRolByIdTest() {
+    void getRolByIdTest() throws NotFoundException {
         // Arrange
         RolEntity entity = new RolEntity();
         entity.setId(ROL_ID);
         entity.setName(NAME_ROL);
-        when(repository.findById(ROL_ID)).thenReturn(Optional.of(entity));
+        when(repository.existsById(ROL_ID))
+            .thenReturn(true);
+        when(repository.findById(ROL_ID))
+            .thenReturn(Optional.of(entity));
         // Act
         RolResponse result = service.getRolById(ROL_ID);
         // Assert
@@ -82,7 +85,7 @@ public class RolServiceImplTest {
     @Test
     void getRolByIdNotFounTest(){
         when(repository.existsById(ROL_ID))
-            .thenReturn(true);
+            .thenReturn(false);
         
         Assertions.assertThrows(NotFoundException.class, 
             ()->service.getRolById(ROL_ID));

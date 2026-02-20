@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.ayd2.congress.dtos.Rol.NewRolRequest;
 import com.ayd2.congress.dtos.Rol.RolResponse;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
+import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.models.User.RolEntity;
 import com.ayd2.congress.repositories.RolRepository;
 
@@ -27,15 +28,15 @@ public class RolServiceImpl implements RolService{
     }
 
     @Override
-    public RolResponse getRolById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRolById'");
+    public RolResponse getRolById(Long id) throws NotFoundException {
+        if (!repository.existsById(id)) 
+            throw new NotFoundException("rol not found");
+        return new RolResponse(repository.findById(id).get());
     }
 
     @Override
     public List<RolEntity> getAllRols() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllRols'");
+        return repository.findAll();   
     }
     
 }
