@@ -21,20 +21,24 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private String cui_passport;
+    @Column(nullable = false,unique = true)
+    private String identification;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     private String lastName;
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String email;
     @Column(nullable = false)
     private String phone;
     @Column
     private String imageUrl;
     @Column
-    private boolean state = true;
+    private boolean isActive = true;
+    @Column
+    private String nacionality;
+    @Column(nullable = false)
+    private String password;
     @ManyToOne
     @JoinColumn(name = "rol_id")
     private RolEntity rol;
