@@ -3,6 +3,7 @@ package com.ayd2.congress.services.Rol;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ayd2.congress.dtos.Rol.NewRolRequest;
 import com.ayd2.congress.dtos.Rol.RolResponse;
@@ -11,6 +12,7 @@ import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.models.User.RolEntity;
 import com.ayd2.congress.repositories.RolRepository;
 
+@Service
 public class RolServiceImpl implements RolService{
     private final RolRepository repository;
     @Autowired
@@ -28,10 +30,8 @@ public class RolServiceImpl implements RolService{
     }
 
     @Override
-    public RolResponse getRolById(Long id) throws NotFoundException {
-        if (!repository.existsById(id)) 
-            throw new NotFoundException("rol not found");
-        return new RolResponse(repository.findById(id).get());
+    public RolEntity getRolById(Long id) throws NotFoundException {
+        return repository.findById(id).orElseThrow(()-> new NotFoundException("Rol with id "+id+" not found"));
     }
 
     @Override

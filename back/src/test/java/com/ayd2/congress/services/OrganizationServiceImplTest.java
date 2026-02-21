@@ -2,7 +2,7 @@ package com.ayd2.congress.services;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,13 +37,14 @@ public class OrganizationServiceImplTest {
     private OrganizationServiceImpl service;
 
     @Test
-    void createOrganizationTest(){
-        NewOrganizationRequest newOrganizationRequest = new NewOrganizationRequest(ORGANIZATION_NAME,ORGANIZATION_NAME);
+    void createOrganizationTest() throws DuplicatedEntityException{
+        NewOrganizationRequest newOrganizationRequest = new NewOrganizationRequest(ORGANIZATION_NAME,ORGANIZATION_IMAGEN);
         ArgumentCaptor<OrganizationEntity> organizationCapture = ArgumentCaptor.forClass(OrganizationEntity.class);
         OrganizationEntity newOrganizationEntity = new OrganizationEntity();
         newOrganizationEntity.setImage(ORGANIZATION_IMAGEN);
         newOrganizationEntity.setName(ORGANIZATION_NAME);
-        when(repository.save(eq(newOrganizationEntity))).thenReturn(newOrganizationEntity);
+        newOrganizationEntity.setCanCreateCongress(false);
+        when(repository.save(any(OrganizationEntity.class))).thenReturn(newOrganizationEntity);
         OrganizationResponse result = service.create(newOrganizationRequest);
         assertAll(
             ()-> verify(repository).save(organizationCapture.capture()),
@@ -65,7 +66,7 @@ public class OrganizationServiceImplTest {
     }   
 
     @Test
-    void getByIdTest(){
+    void getByIdTest() throws NotFoundException{
         OrganizationEntity entity = new OrganizationEntity();
         entity.setId(ORGANIZATION_ID); 
         entity.setImage(ORGANIZATION_IMAGEN);
@@ -74,10 +75,10 @@ public class OrganizationServiceImplTest {
         
         when(repository.findById(ORGANIZATION_ID)).thenReturn(Optional.of(entity));
 
-        OrganizationResponse result = service.getById(ORGANIZATION_ID);
+        OrganizationEntity result = service.getById(ORGANIZATION_ID);
 
         assertAll(
-            ()-> verify(repository.findById(ORGANIZATION_ID)),
+            ()-> verify(repository).findById(ORGANIZATION_ID),
             ()-> assertEquals(ORGANIZATION_ID, result.getId()),
             ()-> assertEquals(ORGANIZATION_NAME, result.getName()),
             ()-> assertEquals(ORGANIZATION_IMAGEN, result.getImage()),
@@ -87,9 +88,9 @@ public class OrganizationServiceImplTest {
 
     @Test
     void getByIdNotFoundTest(){
-        when(repository.existsById(ORGANIZATION_ID)).thenReturn(false);
+        when(repository.findById(ORGANIZATION_ID)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(RuntimeException.class, 
+        Assertions.assertThrows(NotFoundException.class, 
             ()-> service.getById(ORGANIZATION_ID));
     }
 

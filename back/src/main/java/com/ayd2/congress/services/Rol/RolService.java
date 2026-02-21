@@ -10,6 +10,6 @@ import com.ayd2.congress.models.User.RolEntity;
 
 public interface RolService {
     RolResponse createRol(NewRolRequest request) throws DuplicatedEntityException;
-    RolResponse getRolById(Long id) throws NotFoundException;
+    RolEntity getRolById(Long id) throws NotFoundException;
     List<RolEntity> getAllRols();
 }
