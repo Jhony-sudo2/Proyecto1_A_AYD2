@@ -15,19 +15,22 @@ import com.ayd2.congress.services.User.UserService;
 public class AuthServiceImpl implements AuthService{
     private final UserService userService;
     private final PasswordEncoder encoder;
+    private final JwtService jwtService;
 
     @Autowired
-    public AuthServiceImpl(UserService userService,PasswordEncoder encoder){
+    public AuthServiceImpl(UserService userService,PasswordEncoder encoder,JwtService jwtService){
         this.encoder = encoder;
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @Override
     public LoginResponse Login(LoginRequest request) throws NotFoundException, NotAuthorizedException {
         UserEntity user = userService.getByEmail(request.getEmail());
-        if (encoder.matches(request.getPassword(), user.getPassword())) 
-            return new LoginResponse(user.getId(), "EXAMPLE");
-        throw new NotAuthorizedException("invalid credentials");
+        if (!encoder.matches(request.getPassword(), user.getPassword())) 
+           throw new NotAuthorizedException("invalid credentials");
+        String token = jwtService.generateToken(user);
+        return new LoginResponse(token, "Bearer", jwtService.getExpSeconds());
     }
 
     @Override
