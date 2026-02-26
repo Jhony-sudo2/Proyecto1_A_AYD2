@@ -9,6 +9,7 @@ import com.ayd2.congress.dtos.User.UserResponse;
 import com.ayd2.congress.dtos.User.UserUpdate;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.mappers.UserMapper;
 import com.ayd2.congress.models.Organization.OrganizationEntity;
 import com.ayd2.congress.models.User.RolEntity;
 import com.ayd2.congress.models.User.UserEntity;
@@ -22,29 +23,34 @@ public class UserServiceImpl implements UserService {
     private final RolServiceImpl rolService;
     private final OrganizationServiceImpl organizationService;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RolServiceImpl rolService, OrganizationServiceImpl organizationService,PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RolServiceImpl rolService, OrganizationServiceImpl organizationService,PasswordEncoder passwordEncoder,UserMapper userMapper) {
         this.repository = userRepository;
         this.rolService = rolService;
         this.organizationService = organizationService;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
     @Override
     public UserResponse create(NewUserRequest newUserRequest) throws NotFoundException, DuplicatedEntityException {
-        RolEntity rol = rolService.getRolById(newUserRequest.getRol());
-        OrganizationEntity organizationEntity = organizationService.getById(newUserRequest.getOrganization());
-
         if(repository.existsByEmail(newUserRequest.getEmail())){
             throw new DuplicatedEntityException("Email: " + newUserRequest.getEmail() + " already exists");
         }
         if(repository.existsByIdentification(newUserRequest.getIdentification())){
             throw new DuplicatedEntityException("Identification: " + newUserRequest.getIdentification() + " already exist");
         }
+        RolEntity rol = rolService.getRolById(newUserRequest.getRol());
+        OrganizationEntity organizationEntity = organizationService.getById(newUserRequest.getOrganization());
 
         String hashPassword = passwordEncoder.encode(newUserRequest.getPassword());
-        UserEntity userEntity = newUserRequest.createEntity(rol,organizationEntity,hashPassword);
-        repository.save(userEntity);
-        return new UserResponse(userEntity);
+        UserEntity userEntity = userMapper.toEntity(newUserRequest);
+
+        userEntity.setPassword(hashPassword);
+        userEntity.setRol(rol);
+        userEntity.setOrganization(organizationEntity);
+
+        return userMapper.toResponse(repository.save(userEntity));
     }
 
     @Override
@@ -65,8 +71,7 @@ public class UserServiceImpl implements UserService {
         }
         userUpdateRequest.updateUser(userToUpdate);
         repository.save(userToUpdate);
-        return new UserResponse(userToUpdate);
-
+        return userMapper.toResponse(userToUpdate);
     }
     @Override
     public UserResponse updateRol() {

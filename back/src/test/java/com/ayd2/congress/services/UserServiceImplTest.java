@@ -19,6 +19,7 @@ import com.ayd2.congress.dtos.User.UserResponse;
 import com.ayd2.congress.dtos.User.UserUpdate;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.mappers.UserMapper;
 import com.ayd2.congress.models.Organization.OrganizationEntity;
 import com.ayd2.congress.models.User.RolEntity;
 import com.ayd2.congress.models.User.UserEntity;
@@ -36,160 +37,211 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
-    private static final Long USER_ID = 1L;
-    private static final String USER_NAME = "Jhony";
-    private static final String USER_LAST_NAME = "Fuentes";
-    private static final String IDENTIFICATION_NUMBER = "3307535761202";
-    private static final String EMAIL = "jhony.fuentes19@gmail.com";
-    private static final String PHONE = "42882130";
-    private static final String NACIONALITY = "42882130";
-    private static final Long ROL_ID = 1L;
-    private static final Long ORGANIZATION_ID = 1L;
-    private static final String IMAGE_URL = "example.png";
-    private static final String PASSWORD = "password123";
+        private static final Long USER_ID = 1L;
+        private static final String USER_NAME = "Jhony";
+        private static final String USER_LAST_NAME = "Fuentes";
+        private static final String IDENTIFICATION_NUMBER = "3307535761202";
+        private static final String EMAIL = "jhony.fuentes19@gmail.com";
+        private static final String PHONE = "42882130";
+        private static final String NACIONALITY = "42882130";
+        private static final Long ROL_ID = 1L;
+        private static final Long ORGANIZATION_ID = 1L;
+        private static final String IMAGE_URL = "example.png";
+        private static final String PASSWORD = "password123";
+        private static final String HASH = "HASHED";
 
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private RolServiceImpl rolService;
-    @Mock
-    private OrganizationServiceImpl organizationService;
-    @Mock
-    private PasswordEncoder encoder;
-    @InjectMocks
-    private UserServiceImpl userService;
+        @Mock
+        private UserRepository userRepository;
+        @Mock
+        private RolServiceImpl rolService;
+        @Mock
+        private OrganizationServiceImpl organizationService;
+        @Mock
+        private PasswordEncoder encoder;
+        @Mock
+        private UserMapper userMapper;
+        @InjectMocks
+        private UserServiceImpl userService;
 
-    @Test
-    void testUserCreate() throws NotFoundException, DuplicatedEntityException {
-        // Arrange
-        NewUserRequest newUserRequest = new NewUserRequest(IDENTIFICATION_NUMBER, USER_NAME, USER_LAST_NAME, EMAIL,
-                PHONE, IMAGE_URL, NACIONALITY, ROL_ID, ORGANIZATION_ID, PASSWORD);
-        ArgumentCaptor<UserEntity> userCaputre = ArgumentCaptor.forClass(UserEntity.class);
-        UserEntity userEntity = new UserEntity();
-        userEntity.setName(USER_NAME);
-        userEntity.setLastName(USER_LAST_NAME);
-        userEntity.setIdentification(IDENTIFICATION_NUMBER);
-        userEntity.setEmail(EMAIL);
-        userEntity.setPhone(PHONE);
-        userEntity.setImageUrl(IMAGE_URL);
-        userEntity.setNacionality(NACIONALITY);
-        RolEntity rol = new RolEntity();
-        rol.setId(ROL_ID);
-        rol.setName("ADMIN");
+        @Test
+        void createUserTest_AAA() throws NotFoundException, DuplicatedEntityException {
+                // ARRANGE
+                NewUserRequest req = new NewUserRequest(
+                                IDENTIFICATION_NUMBER, USER_NAME, USER_LAST_NAME, EMAIL, PHONE, IMAGE_URL, NACIONALITY,
+                                ROL_ID, ORGANIZATION_ID,
+                                PASSWORD);
 
-        OrganizationEntity organization = new OrganizationEntity();
-        organization.setId(ORGANIZATION_ID);
-        organization.setName("USAC-CUNOC");
+                when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
+                when(userRepository.existsByIdentification(IDENTIFICATION_NUMBER)).thenReturn(false);
 
-        userEntity.setRol(rol);
-        userEntity.setOrganization(organization);
+                RolEntity rol = new RolEntity();
+                rol.setId(ROL_ID);
+                when(rolService.getRolById(ROL_ID)).thenReturn(rol);
 
-        when(rolService.getRolById(1L)).thenReturn(rol);
-        when(organizationService.getById(1L)).thenReturn(organization);
-        when(userRepository.save(userCaputre.capture())).thenReturn(userEntity);
+                OrganizationEntity org = new OrganizationEntity();
+                org.setId(ORGANIZATION_ID);
+                when(organizationService.getById(ORGANIZATION_ID)).thenReturn(org);
 
-        // Act
-        UserResponse result = userService.create(newUserRequest);
+                when(encoder.encode(PASSWORD)).thenReturn(HASH);
 
-        // Assert
-        assertAll(
-                () -> verify(userRepository).save(userCaputre.capture()),
-                () -> assertEquals(USER_NAME, result.getName()),
-                () -> assertEquals(USER_LAST_NAME, result.getLastName()),
-                () -> assertEquals(IDENTIFICATION_NUMBER, result.getIdentification()),
-                () -> assertEquals(EMAIL, result.getEmail()),
-                () -> assertEquals(PHONE, result.getPhone()),
-                () -> assertEquals(IMAGE_URL, result.getImageUrl()),
-                () -> assertEquals(NACIONALITY, result.getNacionality()),
-                () -> assertEquals(ROL_ID, result.getRolId()),
-                () -> assertEquals(ORGANIZATION_ID, result.getOrganizationId()));
-    }
+                UserEntity mapped = new UserEntity();
+                mapped.setIdentification(IDENTIFICATION_NUMBER);
+                mapped.setName(USER_NAME);
+                mapped.setLastName(USER_LAST_NAME);
+                mapped.setEmail(EMAIL);
+                mapped.setPhone(PHONE);
+                mapped.setImageUrl(IMAGE_URL);
+                mapped.setNacionality(NACIONALITY);
+                when(userMapper.toEntity(req)).thenReturn(mapped);
 
-    @Test
-    void createWhenEmailDuplicated() {
-        NewUserRequest request = new NewUserRequest(IDENTIFICATION_NUMBER, USER_LAST_NAME, IDENTIFICATION_NUMBER, EMAIL,
-                PHONE, IMAGE_URL, NACIONALITY, ROL_ID, ORGANIZATION_ID, PASSWORD);
-        when(userRepository.existsByEmail(EMAIL)).thenReturn(true);
-        Assertions.assertThrows(DuplicatedEntityException.class,
-                () -> userService.create(request));
-    }
+                ArgumentCaptor<UserEntity> userCaptor = ArgumentCaptor.forClass(UserEntity.class);
+                UserEntity saved = new UserEntity();
+                saved.setId(USER_ID);
+                saved.setIdentification(IDENTIFICATION_NUMBER);
+                saved.setName(USER_NAME);
+                saved.setLastName(USER_LAST_NAME);
+                saved.setEmail(EMAIL);
+                saved.setPhone(PHONE);
+                saved.setImageUrl(IMAGE_URL);
+                saved.setNacionality(NACIONALITY);
+                saved.setPassword(HASH);
+                saved.setRol(rol);
+                saved.setOrganization(org);
 
-    @Test
-    void createWhenIdDuplicated() {
-        NewUserRequest request = new NewUserRequest(IDENTIFICATION_NUMBER, USER_LAST_NAME, IDENTIFICATION_NUMBER, EMAIL,
-                PHONE, IMAGE_URL, NACIONALITY, ROL_ID, ORGANIZATION_ID, PASSWORD);
-        when(userRepository.existsByIdentification(IDENTIFICATION_NUMBER)).thenReturn(true);
-        Assertions.assertThrows(DuplicatedEntityException.class,
-                () -> userService.create(request));
-    }
+                when(userRepository.save(any(UserEntity.class))).thenReturn(saved);
 
-    @Test
-    void updateUserTest() throws NotFoundException, DuplicatedEntityException {
-        //ARRANGE
-        UserUpdate update = new UserUpdate(USER_NAME, EMAIL, USER_LAST_NAME, PHONE, IMAGE_URL);
+                UserResponse response = new UserResponse(
+                                USER_ID, IDENTIFICATION_NUMBER, USER_NAME, USER_LAST_NAME, EMAIL, PHONE, IMAGE_URL,
+                                true, NACIONALITY,
+                                ROL_ID, ORGANIZATION_ID);
+                when(userMapper.toResponse(saved)).thenReturn(response);
 
-        UserEntity entity = new UserEntity();
-        entity.setId(USER_ID);
-        entity.setName("OldName");
-        entity.setLastName("OldLast");
-        entity.setEmail("old@mail.com");
-        entity.setPhone("00000000");
-        entity.setImageUrl("old.png");
-        RolEntity rol = new RolEntity();
-        rol.setId(ORGANIZATION_ID);
+                // ACT
+                UserResponse result = userService.create(req);
 
-        OrganizationEntity organization = new OrganizationEntity();
-        organization.setId(ORGANIZATION_ID);
+                // ASSERT
+                verify(userRepository).existsByEmail(EMAIL);
+                verify(userRepository).existsByIdentification(IDENTIFICATION_NUMBER);
+                verify(rolService).getRolById(ROL_ID);
+                verify(organizationService).getById(ORGANIZATION_ID);
+                verify(encoder).encode(PASSWORD);
+                verify(userMapper).toEntity(req);
 
-        entity.setRol(rol);
-        entity.setOrganization(organization);
+                verify(userRepository).save(userCaptor.capture());
+                UserEntity arg = userCaptor.getValue();
 
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(entity));
-        when(userRepository.existByEmailAndIdNot(EMAIL, USER_ID)).thenReturn(false);
-        ArgumentCaptor<UserEntity> userCaptor = ArgumentCaptor.forClass(UserEntity.class);
-        when(userRepository.save(any(UserEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+                assertAll(
+                                () -> assertEquals(HASH, arg.getPassword()),
+                                () -> assertEquals(ROL_ID, arg.getRol().getId()),
+                                () -> assertEquals(ORGANIZATION_ID, arg.getOrganization().getId()),
+                                () -> assertEquals(USER_ID, result.getId()),
+                                () -> assertEquals(EMAIL, result.getEmail()),
+                                () -> assertEquals(ROL_ID, result.getRolId()),
+                                () -> assertEquals(ORGANIZATION_ID, result.getOrganizationId()));
+        }
 
-        // ACT
-        UserResponse result = userService.update(update, USER_ID);
+        @Test
+        void createWhenEmailDuplicated() {
+                NewUserRequest request = new NewUserRequest(IDENTIFICATION_NUMBER, USER_LAST_NAME,
+                                IDENTIFICATION_NUMBER, EMAIL,
+                                PHONE, IMAGE_URL, NACIONALITY, ROL_ID, ORGANIZATION_ID, PASSWORD);
+                when(userRepository.existsByEmail(EMAIL)).thenReturn(true);
+                Assertions.assertThrows(DuplicatedEntityException.class,
+                                () -> userService.create(request));
+        }
 
-        // ASSERT
-        verify(userRepository).save(userCaptor.capture());
-        UserEntity saved = userCaptor.getValue();
+        @Test
+        void createWhenIdDuplicated() {
+                NewUserRequest request = new NewUserRequest(IDENTIFICATION_NUMBER, USER_LAST_NAME,
+                                IDENTIFICATION_NUMBER, EMAIL,
+                                PHONE, IMAGE_URL, NACIONALITY, ROL_ID, ORGANIZATION_ID, PASSWORD);
+                when(userRepository.existsByIdentification(IDENTIFICATION_NUMBER)).thenReturn(true);
+                Assertions.assertThrows(DuplicatedEntityException.class,
+                                () -> userService.create(request));
+        }
 
-        assertAll(
-                () -> verify(userRepository).findById(USER_ID),
+        @Test
+        void updateUserTest() throws NotFoundException, DuplicatedEntityException {
+                //ARRANGE 
+                UserUpdate update = new UserUpdate(USER_NAME, EMAIL, USER_LAST_NAME, PHONE, IMAGE_URL);
+                UserEntity entity = new UserEntity();
+                entity.setId(USER_ID);
+                entity.setName("OldName");
+                entity.setLastName("OldLast");
+                entity.setEmail("old@mail.com");
+                entity.setPhone("00000000");
+                entity.setImageUrl("old.png");
 
-                () -> verify(userRepository).existByEmailAndIdNot(EMAIL, USER_ID),
+                RolEntity rol = new RolEntity();
+                rol.setId(ROL_ID);
 
-                () -> assertEquals(USER_NAME, saved.getName()),
-                () -> assertEquals(USER_LAST_NAME, saved.getLastName()),
-                () -> assertEquals(EMAIL, saved.getEmail()),
-                () -> assertEquals(PHONE, saved.getPhone()),
-                () -> assertEquals(IMAGE_URL, saved.getImageUrl()),
+                OrganizationEntity organization = new OrganizationEntity();
+                organization.setId(ORGANIZATION_ID);
 
-                () -> assertEquals(USER_NAME, result.getName()),
-                () -> assertEquals(USER_LAST_NAME, result.getLastName()),
-                () -> assertEquals(EMAIL, result.getEmail()),
-                () -> assertEquals(PHONE, result.getPhone()),
-                () -> assertEquals(IMAGE_URL, result.getImageUrl()));
+                entity.setRol(rol);
+                entity.setOrganization(organization);
 
-        verifyNoMoreInteractions(userRepository);
-    }
+                when(userRepository.findById(USER_ID)).thenReturn(Optional.of(entity));
+                when(userRepository.existByEmailAndIdNot(EMAIL, USER_ID)).thenReturn(false);
 
-    @Test
-    void updateUserWhenEmailDuplicatedTest() {
-        UserUpdate update = new UserUpdate(USER_NAME, EMAIL, USER_LAST_NAME, PHONE, IMAGE_URL);
-        UserEntity entity = new UserEntity();
-        entity.setId(USER_ID);
+                ArgumentCaptor<UserEntity> userCaptor = ArgumentCaptor.forClass(UserEntity.class);
+                when(userRepository.save(any(UserEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(entity));
-        when(userRepository.existByEmailAndIdNot(EMAIL, USER_ID)).thenReturn(true);
+                UserResponse mappedResponse = new UserResponse(
+                                USER_ID,
+                                entity.getIdentification(),
+                                USER_NAME,
+                                USER_LAST_NAME,
+                                EMAIL,
+                                PHONE,
+                                IMAGE_URL,
+                                entity.isActive(),
+                                entity.getNacionality(),
+                                rol.getId(),
+                                organization.getId());
+                when(userMapper.toResponse(any(UserEntity.class))).thenReturn(mappedResponse);
 
-        assertThrows(DuplicatedEntityException.class,
-                () -> userService.update(update, USER_ID));
-        verify(userRepository).findById(USER_ID);
-        verify(userRepository).existByEmailAndIdNot(EMAIL, USER_ID);
-        verify(userRepository, never()).save(any());
-    }
+                //ACT
+                UserResponse result = userService.update(update, USER_ID);
+
+                //ASSERT
+                verify(userRepository).save(userCaptor.capture());
+                UserEntity saved = userCaptor.getValue();
+
+                assertAll(
+                                () -> verify(userRepository).findById(USER_ID),
+                                () -> verify(userRepository).existByEmailAndIdNot(EMAIL, USER_ID),
+                                () -> verify(userMapper).toResponse(saved),
+
+                                () -> assertEquals(USER_NAME, saved.getName()),
+                                () -> assertEquals(USER_LAST_NAME, saved.getLastName()),
+                                () -> assertEquals(EMAIL, saved.getEmail()),
+                                () -> assertEquals(PHONE, saved.getPhone()),
+                                () -> assertEquals(IMAGE_URL, saved.getImageUrl()),
+
+                                () -> assertEquals(USER_NAME, result.getName()),
+                                () -> assertEquals(USER_LAST_NAME, result.getLastName()),
+                                () -> assertEquals(EMAIL, result.getEmail()),
+                                () -> assertEquals(PHONE, result.getPhone()),
+                                () -> assertEquals(IMAGE_URL, result.getImageUrl()));
+
+                verifyNoMoreInteractions(userRepository, userMapper);
+        }
+
+        @Test
+        void updateUserWhenEmailDuplicatedTest() {
+                UserUpdate update = new UserUpdate(USER_NAME, EMAIL, USER_LAST_NAME, PHONE, IMAGE_URL);
+                UserEntity entity = new UserEntity();
+                entity.setId(USER_ID);
+
+                when(userRepository.findById(USER_ID)).thenReturn(Optional.of(entity));
+                when(userRepository.existByEmailAndIdNot(EMAIL, USER_ID)).thenReturn(true);
+
+                assertThrows(DuplicatedEntityException.class,
+                                () -> userService.update(update, USER_ID));
+                verify(userRepository).findById(USER_ID);
+                verify(userRepository).existByEmailAndIdNot(EMAIL, USER_ID);
+                verify(userRepository, never()).save(any());
+        }
 
 }
