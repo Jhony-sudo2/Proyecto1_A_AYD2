@@ -34,7 +34,7 @@ public class UserEntity {
     @Column
     private String imageUrl;
     @Column
-    private boolean isActive = true;
+    private boolean active = true;
     @Column
     private String nacionality;
     @Column(nullable = false)

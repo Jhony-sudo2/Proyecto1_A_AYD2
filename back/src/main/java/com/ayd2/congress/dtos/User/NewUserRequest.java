@@ -1,12 +1,9 @@
 package com.ayd2.congress.dtos.User;
-
-import com.ayd2.congress.models.Organization.OrganizationEntity;
-import com.ayd2.congress.models.User.RolEntity;
-import com.ayd2.congress.models.User.UserEntity;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Value;
 
@@ -28,26 +25,13 @@ public class NewUserRequest {
     private String imageUrl;
     @NotBlank(message = "nacionality requuired")
     private String nacionality;
+    @NotNull(message = "Rol is required")
+    @Positive(message = "rol must be positive")
     private Long rol;
-    @NotBlank(message = "Organization required")
+    @NotNull(message = "Organization required")
+    @Positive(message = "organization must be positive")
     private Long organization;
     @NotBlank(message = "Password required")
     @Size(min = 8,max = 50,message = "Password invalid")
     private String password;
-
-    public UserEntity createEntity(RolEntity rol,OrganizationEntity organizationEntity,String hashPassword){
-        UserEntity newEntity = new UserEntity();
-        newEntity.setName(this.name);
-        newEntity.setLastName(this.lastName);
-        newEntity.setIdentification(this.identification);
-        newEntity.setEmail(this.email);
-        newEntity.setImageUrl(this.imageUrl);
-        newEntity.setRol(rol);
-        newEntity.setOrganization(organizationEntity);
-        newEntity.setPassword(hashPassword);
-        newEntity.setNacionality(this.nacionality);
-        newEntity.setPhone(this.phone);
-        return newEntity; 
-    }
-
 }
