@@ -125,7 +125,7 @@ public class OrganizationServiceImplTest {
         entity.setCanCreateCongress(true);
 
         when(repository.findById(ORGANIZATION_ID)).thenReturn(Optional.of(entity));
-
+        when(repository.save(entity)).thenReturn(entity);
         OrganizationResponse result = service.update(new OrganizationUpdate(ORGANIZATION_NAME, ORGANIZATION_IMAGEN, true), ORGANIZATION_ID);
 
         assertAll(

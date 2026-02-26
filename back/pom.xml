@@ -103,6 +103,31 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+			<groupId>org.jacoco</groupId>
+			<artifactId>jacoco-maven-plugin</artifactId>
+			<version>0.8.14</version>
+			<executions>
+
+				<!-- 1) Engancha el agente antes de correr tests -->
+				<execution>
+				<id>prepare-agent</id>
+				<goals>
+					<goal>prepare-agent</goal>
+				</goals>
+				</execution>
+
+				<!-- 2) Genera el reporte después de los tests -->
+				<execution>
+				<id>report</id>
+				<phase>test</phase>
+				<goals>
+					<goal>report</goal>
+				</goals>
+				</execution>
+
+			</executions>
+			</plugin>
 		</plugins>
 	</build>
 
