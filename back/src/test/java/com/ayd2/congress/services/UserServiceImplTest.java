@@ -15,9 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ayd2.congress.dtos.User.NewUserRequest;
+import com.ayd2.congress.dtos.User.UpdatePassword;
 import com.ayd2.congress.dtos.User.UserResponse;
 import com.ayd2.congress.dtos.User.UserUpdate;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
+import com.ayd2.congress.exceptions.NotAuthorizedException;
 import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.mappers.UserMapper;
 import com.ayd2.congress.models.Organization.OrganizationEntity;
@@ -27,8 +29,10 @@ import com.ayd2.congress.repositories.UserRepository;
 import com.ayd2.congress.services.Organization.OrganizationServiceImpl;
 import com.ayd2.congress.services.Rol.RolServiceImpl;
 import com.ayd2.congress.services.User.UserServiceImpl;
+import com.ayd2.congress.services.Wallet.WalletService;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -48,6 +52,7 @@ public class UserServiceImplTest {
         private static final Long ORGANIZATION_ID = 1L;
         private static final String IMAGE_URL = "example.png";
         private static final String PASSWORD = "password123";
+        private static final String NEW_PASSWORD = "newPassword123";
         private static final String HASH = "HASHED";
 
         @Mock
@@ -60,11 +65,13 @@ public class UserServiceImplTest {
         private PasswordEncoder encoder;
         @Mock
         private UserMapper userMapper;
+        @Mock
+        private WalletService walletService;
         @InjectMocks
         private UserServiceImpl userService;
 
         @Test
-        void createUserTest_AAA() throws NotFoundException, DuplicatedEntityException {
+        void createUserTest() throws NotFoundException, DuplicatedEntityException {
                 // ARRANGE
                 NewUserRequest req = new NewUserRequest(
                                 IDENTIFICATION_NUMBER, USER_NAME, USER_LAST_NAME, EMAIL, PHONE, IMAGE_URL, NACIONALITY,
@@ -162,7 +169,7 @@ public class UserServiceImplTest {
 
         @Test
         void updateUserTest() throws NotFoundException, DuplicatedEntityException {
-                //ARRANGE 
+                // ARRANGE
                 UserUpdate update = new UserUpdate(USER_NAME, EMAIL, USER_LAST_NAME, PHONE, IMAGE_URL);
                 UserEntity entity = new UserEntity();
                 entity.setId(USER_ID);
@@ -182,7 +189,7 @@ public class UserServiceImplTest {
                 entity.setOrganization(organization);
 
                 when(userRepository.findById(USER_ID)).thenReturn(Optional.of(entity));
-                when(userRepository.existByEmailAndIdNot(EMAIL, USER_ID)).thenReturn(false);
+                when(userRepository.existsByEmailAndIdNot(EMAIL, USER_ID)).thenReturn(false);
 
                 ArgumentCaptor<UserEntity> userCaptor = ArgumentCaptor.forClass(UserEntity.class);
                 when(userRepository.save(any(UserEntity.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -201,16 +208,16 @@ public class UserServiceImplTest {
                                 organization.getId());
                 when(userMapper.toResponse(any(UserEntity.class))).thenReturn(mappedResponse);
 
-                //ACT
+                // ACT
                 UserResponse result = userService.update(update, USER_ID);
 
-                //ASSERT
+                // ASSERT
                 verify(userRepository).save(userCaptor.capture());
                 UserEntity saved = userCaptor.getValue();
 
                 assertAll(
                                 () -> verify(userRepository).findById(USER_ID),
-                                () -> verify(userRepository).existByEmailAndIdNot(EMAIL, USER_ID),
+                                () -> verify(userRepository).existsByEmailAndIdNot(EMAIL, USER_ID),
                                 () -> verify(userMapper).toResponse(saved),
 
                                 () -> assertEquals(USER_NAME, saved.getName()),
@@ -235,13 +242,59 @@ public class UserServiceImplTest {
                 entity.setId(USER_ID);
 
                 when(userRepository.findById(USER_ID)).thenReturn(Optional.of(entity));
-                when(userRepository.existByEmailAndIdNot(EMAIL, USER_ID)).thenReturn(true);
+                when(userRepository.existsByEmailAndIdNot(EMAIL, USER_ID)).thenReturn(true);
 
                 assertThrows(DuplicatedEntityException.class,
                                 () -> userService.update(update, USER_ID));
                 verify(userRepository).findById(USER_ID);
-                verify(userRepository).existByEmailAndIdNot(EMAIL, USER_ID);
+                verify(userRepository).existsByEmailAndIdNot(EMAIL, USER_ID);
                 verify(userRepository, never()).save(any());
+        }
+
+        @Test
+        void updatePasswordTest() throws NotFoundException, NotAuthorizedException {
+                UserEntity user = new UserEntity();
+                user.setId(USER_ID);
+                user.setPassword(HASH); 
+                UpdatePassword request = new UpdatePassword(PASSWORD, NEW_PASSWORD);
+
+                when(userRepository.findById(USER_ID)).thenReturn(java.util.Optional.of(user));
+                when(encoder.matches(PASSWORD, HASH)).thenReturn(true); 
+                when(encoder.encode(NEW_PASSWORD)).thenReturn("NEW_HASH");
+
+                // Act
+                userService.updatePassword(request, USER_ID);
+
+                // Assert
+                ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
+                verify(userRepository).save(captor.capture());
+
+                UserEntity saved = captor.getValue();
+                assertEquals(USER_ID, saved.getId());
+                assertEquals("NEW_HASH", saved.getPassword());
+
+                verify(encoder).matches(PASSWORD, HASH);
+                verify(encoder).encode(NEW_PASSWORD);
+                verifyNoMoreInteractions(userRepository, encoder);
+        }
+
+        @Test
+        void updatePassword_when_IncorrectCredentialsTest() {
+                // Arrange
+                UserEntity user = new UserEntity();
+                user.setId(USER_ID);
+                user.setPassword(HASH);
+
+                UpdatePassword request = new UpdatePassword("bad-password", NEW_PASSWORD);
+
+                when(userRepository.findById(USER_ID)).thenReturn(java.util.Optional.of(user));
+                when(encoder.matches("bad-password", HASH)).thenReturn(false);
+
+                // Act + Assert
+                assertThrows(NotAuthorizedException.class, () -> userService.updatePassword(request, USER_ID));
+
+                verify(userRepository, never()).save(any());
+                verify(encoder, never()).encode(anyString());
         }
 
 }

@@ -12,10 +12,6 @@ import lombok.Value;
 
 @Value
 public class RechargeRequest {
-    @NotNull(message = "wallet id required")
-    @Positive(message = "wallet id must be positive")
-    Long walletId;
-
     @NotNull(message = "amount is required")
     @Positive(message = "amount must be positive")
     @DecimalMin(value = "10.0", inclusive = true, message = "amount must be at least 10")

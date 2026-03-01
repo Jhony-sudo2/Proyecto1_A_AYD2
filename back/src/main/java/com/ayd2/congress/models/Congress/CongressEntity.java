@@ -1,7 +1,6 @@
 package com.ayd2.congress.models.Congress;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import com.ayd2.congress.models.Organization.OrganizationEntity;
 
@@ -39,6 +38,10 @@ public class CongressEntity {
     @Column(nullable = false)
     private LocalDate endDate;
     @Column(nullable = false)
-    private LocalDateTime endCallDate;
+    private LocalDate endCallDate;
+    @Column(nullable = false)
+    private String description;
+    @Column(nullable = false)
+    private String imageUrl;
 
 }

@@ -22,7 +22,7 @@ public class RolServiceImpl implements RolService{
 
     @Override
     public RolResponse createRol(NewRolRequest request) throws DuplicatedEntityException {
-        if(repository.existByName(request.getName()))
+        if(repository.existsByName(request.getName()))
             throw new DuplicatedEntityException("");
         RolEntity newEntity = request.createEntity();
         newEntity = repository.save(newEntity);

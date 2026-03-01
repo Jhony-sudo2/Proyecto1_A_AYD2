@@ -59,7 +59,7 @@ public class OrganizationServiceImplTest {
     void createWhenDuplicatedNameTest(){
         NewOrganizationRequest newOrganizationRequest = new NewOrganizationRequest(ORGANIZATION_NAME,ORGANIZATION_NAME);
 
-        when(repository.existByName(ORGANIZATION_NAME)).thenReturn(true);
+        when(repository.existsByName(ORGANIZATION_NAME)).thenReturn(true);
 
         Assertions.assertThrows(DuplicatedEntityException.class, 
             ()-> service.create(newOrganizationRequest));
@@ -146,7 +146,7 @@ public class OrganizationServiceImplTest {
         entity.setCanCreateCongress(true);
 
         when(repository.findById(ORGANIZATION_ID)).thenReturn(Optional.of(entity));
-        when(repository.existByNameAndIdNot(ORGANIZATION_NAME, ORGANIZATION_ID)).thenReturn(true);
+        when(repository.existsByNameAndIdNot(ORGANIZATION_NAME, ORGANIZATION_ID)).thenReturn(true);
 
         Assertions.assertThrows(DuplicatedEntityException.class, 
             ()-> service.update(new OrganizationUpdate(ORGANIZATION_NAME, ORGANIZATION_IMAGEN, true), ORGANIZATION_ID));
