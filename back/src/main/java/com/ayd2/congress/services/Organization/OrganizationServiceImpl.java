@@ -24,7 +24,7 @@ public class OrganizationServiceImpl implements OrganizationService{
 
     @Override
     public OrganizationResponse create(NewOrganizationRequest request) throws DuplicatedEntityException {
-        if(repository.existByName(request.getName())){
+        if(repository.existsByName(request.getName())){
             throw new DuplicatedEntityException("Organization with name "+request.getName()+" already exists");
         }
         OrganizationEntity entity = request.createEntity();
@@ -46,7 +46,7 @@ public class OrganizationServiceImpl implements OrganizationService{
     public OrganizationResponse update(OrganizationUpdate request, Long id)
             throws NotFoundException, DuplicatedEntityException {
         OrganizationEntity organizationUpdate = getById(id);
-        boolean exist = repository.existByNameAndIdNot(request.getName(), id);
+        boolean exist = repository.existsByNameAndIdNot(request.getName(), id);
         if(exist){
             throw new DuplicatedEntityException("Organization with name "+request.getName()+" already exists");
         }

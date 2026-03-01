@@ -9,9 +9,11 @@ import com.ayd2.congress.dtos.Wallet.RechargeRequest;
 import com.ayd2.congress.dtos.Wallet.WalletResponse;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.mappers.WalletMapper;
 import com.ayd2.congress.models.User.UserEntity;
 import com.ayd2.congress.models.Wallet.RechargeWalletEntity;
 import com.ayd2.congress.models.Wallet.WalletEntity;
+import com.ayd2.congress.repositories.UserRepository;
 import com.ayd2.congress.repositories.Wallet.RechargeWalletRepository;
 import com.ayd2.congress.repositories.Wallet.WalletRepository;
 
@@ -21,16 +23,21 @@ import jakarta.transaction.Transactional;
 public class WalletServiceImpl implements WalletService{
     private final WalletRepository walletRepository;
     private final RechargeWalletRepository rechargeRepository;
-
+    private final WalletMapper walletMapper;
+    private final UserRepository userRepository;
     
-    public WalletServiceImpl(WalletRepository walletRepository, RechargeWalletRepository rechargeRepository) {
+    public WalletServiceImpl(WalletRepository walletRepository, RechargeWalletRepository rechargeRepository,WalletMapper walletMapper
+        ,UserRepository userRepository
+    ) {
         this.walletRepository = walletRepository;
         this.rechargeRepository = rechargeRepository;
+        this.walletMapper = walletMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
     public WalletEntity create(UserEntity user) throws DuplicatedEntityException{
-        if (walletRepository.existByUserId(user.getId())) 
+        if (walletRepository.existsByUserId(user.getId())) 
             throw new DuplicatedEntityException("User already has a wallet ");
         
         WalletEntity newEntity =  new WalletEntity();
@@ -40,14 +47,13 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     @Transactional
-    public WalletResponse recharge(RechargeRequest request) throws NotFoundException {
-        WalletEntity walletToUpdate = getById(request.getWalletId());
+    public WalletResponse recharge(RechargeRequest request,Long userId) throws NotFoundException {
+        WalletEntity walletToUpdate = getByUserId(userId);
         walletToUpdate.setValue(walletToUpdate.getValue() + request.getAmount());
 
         RechargeWalletEntity newHistory = request.createEntity(walletToUpdate);
         rechargeRepository.save(newHistory);
-        walletRepository.save(walletToUpdate);
-        return new WalletResponse(walletToUpdate);
+        return walletMapper.toResponse(walletRepository.save(walletToUpdate))  ;
     }
 
     @Override
@@ -63,6 +69,19 @@ public class WalletServiceImpl implements WalletService{
             .map(e -> new RechargeHistory(
                 e.getAmount(), e.getDate()))
             .toList();
+    }
+
+    @Override
+    public WalletEntity getByUserId(Long userId) throws NotFoundException {
+        userRepository.findById(userId)
+            .orElseThrow(()-> new NotFoundException("USER NOT FOUND"));
+        return walletRepository.findByUserId(userId)
+            .orElseThrow(()-> new NotFoundException("WALLET NOT FOUND"));
+    }
+
+    @Override
+    public WalletResponse getByUserIdResponse(Long userId) throws NotFoundException {
+        return walletMapper.toResponse(getByUserId(userId));
     }
     
 }

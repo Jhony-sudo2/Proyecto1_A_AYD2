@@ -23,9 +23,11 @@ import com.ayd2.congress.dtos.Wallet.RechargeRequest;
 import com.ayd2.congress.dtos.Wallet.WalletResponse;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.mappers.WalletMapper;
 import com.ayd2.congress.models.User.UserEntity;
 import com.ayd2.congress.models.Wallet.RechargeWalletEntity;
 import com.ayd2.congress.models.Wallet.WalletEntity;
+import com.ayd2.congress.repositories.UserRepository;
 import com.ayd2.congress.repositories.Wallet.RechargeWalletRepository;
 import com.ayd2.congress.repositories.Wallet.WalletRepository;
 import com.ayd2.congress.services.Wallet.WalletServiceImpl;
@@ -43,6 +45,10 @@ public class WalletServiceImplTest {
     private WalletRepository walletRepository;
     @Mock
     private RechargeWalletRepository rechargeRepository;
+    @Mock
+    private WalletMapper walletMapper;
+    @Mock
+    private UserRepository userRepository;
     @InjectMocks
     private WalletServiceImpl service;
 
@@ -57,7 +63,7 @@ public class WalletServiceImplTest {
         walletEntity.setValue(0.0);
         ArgumentCaptor<WalletEntity> captor = ArgumentCaptor.forClass(WalletEntity.class);
         when(walletRepository.save(any(WalletEntity.class))).thenReturn(walletEntity);
-
+        //when(userRepository.findById(USER_ID)).thenReturn(Optional.of(userEntity));
         // ACT
         WalletEntity result = service.create(userEntity);
         // ASSERTS
@@ -77,7 +83,7 @@ public class WalletServiceImplTest {
         walletEntity.setId(WALLET_ID);
         walletEntity.setUser(userEntity);
         walletEntity.setValue(0.0);
-        when(walletRepository.existByUserId(USER_ID)).thenReturn(true);
+        when(walletRepository.existsByUserId(USER_ID)).thenReturn(true);
         assertThrows(DuplicatedEntityException.class,
                 () -> service.create(userEntity));
     }
@@ -111,29 +117,32 @@ public class WalletServiceImplTest {
     @Test
     void rechargeTest() throws NotFoundException {
         //ARRANGE
-        RechargeRequest request = new RechargeRequest(WALLET_ID, AMOUNT, DATE);
+        RechargeRequest request = new RechargeRequest(AMOUNT, DATE);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(USER_ID);
 
         WalletEntity wallet = new WalletEntity();
         wallet.setId(WALLET_ID);
         wallet.setValue(INITIAL_VALUE);
 
-        when(walletRepository.findById(WALLET_ID)).thenReturn(Optional.of(wallet));
+        WalletResponse expected = new WalletResponse(USER_ID, EXPECTED_VALUE);
 
         ArgumentCaptor<RechargeWalletEntity> historyCaptor = ArgumentCaptor.forClass(RechargeWalletEntity.class);
-
         ArgumentCaptor<WalletEntity> walletCaptor = ArgumentCaptor.forClass(WalletEntity.class);
 
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(userEntity));
         when(rechargeRepository.save(any(RechargeWalletEntity.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
         when(walletRepository.save(any(WalletEntity.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
-
+        when(walletRepository.findByUserId(USER_ID)).thenReturn(Optional.of(wallet));
+        when(walletMapper.toResponse(wallet)).thenReturn(expected);
+        
         //ACT
-        WalletResponse response = service.recharge(request);
+        WalletResponse response = service.recharge(request,USER_ID);
 
         //ASSERT
-        verify(walletRepository).findById(WALLET_ID);
 
         verify(rechargeRepository).save(historyCaptor.capture());
         RechargeWalletEntity savedHistory = historyCaptor.getValue();

@@ -26,8 +26,10 @@ public class ConferenceRoomEntity {
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
-    private long capacity;
+    private Integer capacity;
     @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
+    private String equipment;
 
 }

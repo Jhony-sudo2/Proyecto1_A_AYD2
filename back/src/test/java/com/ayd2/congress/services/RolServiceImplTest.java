@@ -54,7 +54,7 @@ public class RolServiceImplTest {
     void createRolWhenDuplicatedNameTest() {
         // Arrange
         NewRolRequest newRol = new NewRolRequest(NAME_ROL);
-        when(repository.existByName(NAME_ROL))
+        when(repository.existsByName(NAME_ROL))
                 .thenReturn(true);
 
         Assertions.assertThrows(DuplicatedEntityException.class,
