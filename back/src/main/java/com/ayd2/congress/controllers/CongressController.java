@@ -41,7 +41,7 @@ public class CongressController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CongressResponse> updateCongress(@PathVariable Long id,@Validated @RequestBody UpdateCongress updateCongress) throws NotFoundException{
+    public ResponseEntity<CongressResponse> updateCongress(@PathVariable Long id,@Validated @RequestBody UpdateCongress updateCongress) throws NotFoundException, InvalidDateRangeException{
         CongressResponse response = service.update(updateCongress,id);
         return ResponseEntity.ok(response);
     }

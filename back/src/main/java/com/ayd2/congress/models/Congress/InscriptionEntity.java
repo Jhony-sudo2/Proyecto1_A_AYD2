@@ -14,10 +14,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "attendee")
+@Table(name = "inscriptions")
 @Data
 @NoArgsConstructor
-public class AttendeeEntity {
+public class InscriptionEntity {
 
     @EmbeddedId
     private AttendeeId id;
