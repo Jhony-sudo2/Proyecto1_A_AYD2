@@ -69,9 +69,21 @@ public class CongressServiceImpl implements CongressService{
 
     
     @Override
-    public CongressResponse update(UpdateCongress updateCongress,Long id) throws NotFoundException {
+    public CongressResponse update(UpdateCongress updateCongress,Long id) throws NotFoundException, InvalidDateRangeException {
+        LocationEntity location = locationService.getLocationById(updateCongress.getLocationId());
+
         CongressEntity congressToUpdate = getById(id);
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        LocalDate startCongressDate = congressToUpdate.getStartDate();
+        
+        if (updateCongress.getEndCallDate().isAfter(startCongressDate)) {
+            throw new InvalidDateRangeException("DATE INVALID TO CALL TO APPLICATION");
+        }  
+        
+        congressToUpdate.setName(updateCongress.getName());
+        congressToUpdate.setDescription(updateCongress.getDescription());
+        congressToUpdate.setLocation(location);
+        congressRepository.save(congressToUpdate);
+        return congressMapper.toResponse(congressToUpdate);
     }
 
     @Override

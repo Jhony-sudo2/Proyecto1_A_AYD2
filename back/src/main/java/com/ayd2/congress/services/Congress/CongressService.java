@@ -12,7 +12,7 @@ import com.ayd2.congress.models.Congress.CongressEntity;
 
 public interface CongressService {
     CongressResponse create(NewCongressRequest request) throws NotFoundException,InvalidDateRangeException,InvalidPriceException;
-    CongressResponse update(UpdateCongress updateCongress,Long id) throws NotFoundException;
+    CongressResponse update(UpdateCongress updateCongress,Long id) throws NotFoundException,InvalidDateRangeException;
     CongressEntity getById(Long id) throws NotFoundException;
     CongressResponse getByIdResponse(Long id) throws NotFoundException;
     List<CongressResponse> getAllByOrganizationId(Long organizationId) throws NotFoundException;

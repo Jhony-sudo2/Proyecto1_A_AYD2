@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
+import com.ayd2.congress.exceptions.InsufficientFundsException;
 import com.ayd2.congress.exceptions.InvalidDateRangeException;
 import com.ayd2.congress.exceptions.InvalidPriceException;
 import com.ayd2.congress.exceptions.NotAuthorizedException;
@@ -57,5 +58,10 @@ public class ControllerExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @ExceptionHandler(InsufficientFundsException.class)
+    @ResponseStatus(HttpStatus.PAYMENT_REQUIRED)
+    public String handleInsufficientFundsException(InsufficientFundsException ex){
+        return ex.getMessage();
+    }
 
 }
