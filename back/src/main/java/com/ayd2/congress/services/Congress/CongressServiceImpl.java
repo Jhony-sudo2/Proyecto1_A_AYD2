@@ -1,6 +1,6 @@
 package com.ayd2.congress.services.Congress;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +45,9 @@ public class CongressServiceImpl implements CongressService{
         OrganizationEntity organization = organizationService.getById(request.getOrganizationId());
         LocationEntity location = locationService.getLocationById(request.getLocationId());
 
-        LocalDate startDate = request.getStartDate();
-        LocalDate endDate  = request.getEndDate();
-        LocalDate endCallDate = request.getEndCallDate();
+        LocalDateTime startDate = request.getStartDate();
+        LocalDateTime endDate  = request.getEndDate();
+        LocalDateTime endCallDate = request.getEndCallDate();
         Double minPirceCongress = systemConfigService.getConfiguration().getPrice();
         if (startDate.isAfter(endDate)) {
             throw new InvalidDateRangeException("DATE INVALID");
@@ -73,7 +73,7 @@ public class CongressServiceImpl implements CongressService{
         LocationEntity location = locationService.getLocationById(updateCongress.getLocationId());
 
         CongressEntity congressToUpdate = getById(id);
-        LocalDate startCongressDate = congressToUpdate.getStartDate();
+        LocalDateTime startCongressDate = congressToUpdate.getStartDate();
         
         if (updateCongress.getEndCallDate().isAfter(startCongressDate)) {
             throw new InvalidDateRangeException("DATE INVALID TO CALL TO APPLICATION");

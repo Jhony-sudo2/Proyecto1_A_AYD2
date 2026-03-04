@@ -1,6 +1,6 @@
 package com.ayd2.congress.dtos.Congress;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Value;
 
@@ -8,7 +8,7 @@ import lombok.Value;
 public class UpdateCongress {
     private String name;
     private String description;
-    private LocalDate endCallDate;
+    private LocalDateTime endCallDate;
     private String imageUrl;
     private Long locationId;
 }

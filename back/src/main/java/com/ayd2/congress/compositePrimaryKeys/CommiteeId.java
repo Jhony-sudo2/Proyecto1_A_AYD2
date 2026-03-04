@@ -4,14 +4,14 @@ import java.util.Objects;
 
 import jakarta.persistence.Column;
 
-public class GuestId {
+public class CommiteeId {
     @Column(name = "congress_id")
     private Long congressId;
     @Column(name = "user_id")
     private Long userId;
-    public GuestId() {
+    public CommiteeId() {
     }
-    public GuestId(Long congressId, Long userId) {
+    public CommiteeId(Long congressId, Long userId) {
         this.congressId = congressId;
         this.userId = userId;
     }
@@ -31,9 +31,9 @@ public class GuestId {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof GuestId))
+        if (!(o instanceof CommiteeId))
             return false;
-        GuestId that = (GuestId) o;
+        CommiteeId that = (CommiteeId) o;
         return Objects.equals(congressId, that.congressId)
                 && Objects.equals(userId, that.userId);
     }

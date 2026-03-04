@@ -17,6 +17,7 @@ public interface InscriptionService {
     List<PayResponse> getPaymentsByUserId(Long userId) throws NotFoundException;
     List<InscriptionResponse> getInscriptionsByUserId(Long userId) throws NotFoundException;
     List<InscriptionResponse> getInscriptionsByCongressId(Long congressId) throws NotFoundException;
+    boolean isUserEnrolledInCongress(Long userId, Long congressId) throws NotFoundException;
     PaymentEntity getPayById(Long id) throws NotFoundException;
     InscriptionEntity getInscriptionById(Long id) throws NotFoundException;
 }

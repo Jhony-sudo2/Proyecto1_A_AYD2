@@ -1,6 +1,6 @@
 package com.ayd2.congress.models.Congress;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.ayd2.congress.models.Organization.OrganizationEntity;
 
@@ -34,11 +34,11 @@ public class CongressEntity {
     @JoinColumn(name = "location_id")
     private LocationEntity location;
     @Column(nullable = false)
-    private LocalDate startDate;
+    private LocalDateTime startDate;
     @Column(nullable = false)
-    private LocalDate endDate;
+    private LocalDateTime endDate;
     @Column(nullable = false)
-    private LocalDate endCallDate;
+    private LocalDateTime endCallDate;
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)

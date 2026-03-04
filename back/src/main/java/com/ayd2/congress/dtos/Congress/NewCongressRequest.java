@@ -1,6 +1,6 @@
 package com.ayd2.congress.dtos.Congress;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Value;
 
@@ -11,7 +11,7 @@ public class NewCongressRequest {
     private Double price;
     private Long organizationId;
     private Long locationId;
-    private LocalDate endCallDate;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime endCallDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 }

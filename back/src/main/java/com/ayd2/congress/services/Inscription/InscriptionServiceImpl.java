@@ -136,6 +136,13 @@ public class InscriptionServiceImpl implements InscriptionService{
             .orElseThrow(()-> new NotFoundException("INSCRIPTION NOT FOUND"));
     }
 
+    @Override
+    public boolean isUserEnrolledInCongress(Long userId, Long congressId) throws NotFoundException {
+        UserEntity userEntity = userService.getById(userId);
+        CongressEntity congressEntity = congressService.getById(congressId);
+        return inscriptionRepository.existsByUserIdAndCongressId(userEntity.getId(), congressEntity.getId());
+    }
+
     
     
 }
