@@ -1,6 +1,6 @@
-package com.ayd2.congress.models.Congress;
+package com.ayd2.congress.models.Activities;
 
-import com.ayd2.congress.compositePrimaryKeys.GuestId;
+import com.ayd2.congress.compositePrimaryKeys.ProposalManagerId;
 import com.ayd2.congress.models.User.UserEntity;
 
 import jakarta.persistence.EmbeddedId;
@@ -13,20 +13,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "guest")
+@Table(name = "proposal_manager")
 @Data
 @NoArgsConstructor
-public class GuestEntity {
+public class ProposalManagerEntity {
     @EmbeddedId
-    private GuestId id;
+    private ProposalManagerId id;
 
-    @MapsId("congressId")
-    @ManyToOne
-    @JoinColumn(name = "congress_id")
-    private CongressEntity congress;
-
+    @MapsId("proposalId")
+    @ManyToOne 
+    @JoinColumn(name = "proposal_id", nullable = false)  
+    private ProposalEntity proposal;
     @MapsId("userId")
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 }

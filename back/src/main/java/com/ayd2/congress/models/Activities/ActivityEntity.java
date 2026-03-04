@@ -3,6 +3,7 @@ package com.ayd2.congress.models.Activities;
 import java.time.LocalDateTime;
 
 import com.ayd2.congress.models.Congress.ConferenceRoomEntity;
+import com.ayd2.congress.models.Enums.ActivityType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,16 +29,14 @@ public class ActivityEntity {
     @Column(nullable = false)
     private LocalDateTime endDate;
     private boolean state = false;
-
-    @ManyToOne
-    @JoinColumn(name = "type_id")
-    private ActivityTypesEntity type;
-
+    @Column(nullable = false)
+    private ActivityType type;
     @ManyToOne
     @JoinColumn(name = "room_id")
     private ConferenceRoomEntity room;
-
-
+    @ManyToOne
+    @JoinColumn(name = "proposal_id")
+    private ProposalEntity proposal;
     @Column(nullable = true)
     private long capacity;
 
