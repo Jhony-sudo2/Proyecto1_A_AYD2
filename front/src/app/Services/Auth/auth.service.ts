@@ -18,10 +18,10 @@ export class AuthService {
   
     return this.http.post<LoginResponse>(this.baseUrl, data).pipe(
       tap((res) => {
-        
+        console.log(res);
         this.cookies.set(
           this.TOKEN_COOKIE,
-          res.token,
+          res.accesToken,
           undefined, 
           '/',       
           undefined, 

@@ -1,7 +1,7 @@
 export interface LoginResponse {
-  token: string;
+  accesToken: string;
   tokenType: string; 
-  expSeconds: number;
+  expiresIn: number;
 }
 
 export interface Login{

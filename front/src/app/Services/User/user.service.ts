@@ -18,7 +18,7 @@ export class UserService {
   }
 
   getOrganizations():Observable<Organization[]>{
-    return this.http.get<Organization[]>(this.baseUrl)
+    return this.http.get<Organization[]>(this.organizationUrl)
   }
 
 
