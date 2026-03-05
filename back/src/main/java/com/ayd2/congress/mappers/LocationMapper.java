@@ -17,6 +17,7 @@ public interface LocationMapper {
     @Mapping(target = "id", ignore = true)
     LocationEntity toEntity(NewLocationRequest entity);
     LocationResponse toResponse(LocationEntity entity);
+    List<LocationResponse> toResponseList(List<LocationEntity> entities);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "location", ignore = true)

@@ -1,5 +1,7 @@
 package com.ayd2.congress.controllers;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,7 @@ public class UserController {
         this.service = service;
     }
     @PostMapping
-    public ResponseEntity<UserResponse> saveUser(@RequestBody NewUserRequest request) throws NotFoundException, DuplicatedEntityException{
+    public ResponseEntity<UserResponse> saveUser(@RequestBody NewUserRequest request) throws NotFoundException, DuplicatedEntityException, IOException{
         UserResponse response = service.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 public class AttendanceResponse {
-    private Long activityId;
-    private String activityName;
+    private Long userId;
+    private String userName;
     private AttendanceType type;
 }

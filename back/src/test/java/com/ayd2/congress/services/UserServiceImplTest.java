@@ -3,6 +3,7 @@ package com.ayd2.congress.services;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -71,7 +72,7 @@ public class UserServiceImplTest {
         private UserServiceImpl userService;
 
         @Test
-        void createUserTest() throws NotFoundException, DuplicatedEntityException {
+        void createUserTest() throws NotFoundException, DuplicatedEntityException, IOException {
                 // ARRANGE
                 NewUserRequest req = new NewUserRequest(
                                 IDENTIFICATION_NUMBER, USER_NAME, USER_LAST_NAME, EMAIL, PHONE, IMAGE_URL, NACIONALITY,

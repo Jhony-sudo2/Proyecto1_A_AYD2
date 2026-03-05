@@ -1,10 +1,8 @@
 package com.ayd2.congress.exceptionhandler;
 
-import java.util.HashMap;
-import java.util.Map;
+
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -27,40 +25,42 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(DuplicatedEntityException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleDuplicatedException(DuplicatedEntityException ex){
+    public String handleDuplicatedException(DuplicatedEntityException ex) {
         return ex.getMessage();
     }
 
     @ExceptionHandler(NotAuthorizedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleNotAutorizedException(NotAuthorizedException ex){
+    public String handleNotAutorizedException(NotAuthorizedException ex) {
         return ex.getMessage();
     }
 
     @ExceptionHandler(InvalidDateRangeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleInvalidException(InvalidDateRangeException ex){
+    public String handleInvalidException(InvalidDateRangeException ex) {
         return ex.getMessage();
     }
 
     @ExceptionHandler(InvalidPriceException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleInvalidPriceExcepcion(InvalidPriceException ex){
+    public String handleInvalidPriceExcepcion(InvalidPriceException ex) {
         return ex.getMessage();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleArgumentNotValidException(MethodArgumentNotValidException ex){
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors()
-          .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
-        return ResponseEntity.badRequest().body(errors);
+    public String handleArgumentNotValidException(MethodArgumentNotValidException ex) {
+        if (ex.getBindingResult().getFieldErrors().isEmpty()) {
+            return "Validation error";
+        }
+
+        var fe = ex.getBindingResult().getFieldErrors().get(0);
+        return fe.getField() + ": " + fe.getDefaultMessage();
     }
 
     @ExceptionHandler(InsufficientFundsException.class)
     @ResponseStatus(HttpStatus.PAYMENT_REQUIRED)
-    public String handleInsufficientFundsException(InsufficientFundsException ex){
+    public String handleInsufficientFundsException(InsufficientFundsException ex) {
         return ex.getMessage();
     }
 

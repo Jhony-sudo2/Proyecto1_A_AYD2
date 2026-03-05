@@ -1,5 +1,7 @@
 package com.ayd2.congress.services.User;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import com.ayd2.congress.repositories.UserRepository;
 import com.ayd2.congress.services.Organization.OrganizationServiceImpl;
 import com.ayd2.congress.services.Rol.RolServiceImpl;
 import com.ayd2.congress.services.Wallet.WalletService;
+import com.ayd2.congress.services.aws.S3Service;
 
 import jakarta.transaction.Transactional;
 
@@ -30,22 +33,25 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final WalletService walletService;
+    private final S3Service s3Service;
+
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, RolServiceImpl rolService,
             OrganizationServiceImpl organizationService, PasswordEncoder passwordEncoder, UserMapper userMapper,
-            WalletService walletService) {
+            WalletService walletService, S3Service s3Service) {
         this.repository = userRepository;
         this.rolService = rolService;
         this.organizationService = organizationService;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.walletService = walletService;
+        this.s3Service = s3Service;
     }
 
     @Transactional
     @Override
-    public UserResponse create(NewUserRequest newUserRequest) throws NotFoundException, DuplicatedEntityException {
+    public UserResponse create(NewUserRequest newUserRequest) throws NotFoundException, DuplicatedEntityException, IOException {
         if (repository.existsByEmail(newUserRequest.getEmail())) {
             throw new DuplicatedEntityException("Email: " + newUserRequest.getEmail() + " already exists");
         }
@@ -58,10 +64,11 @@ public class UserServiceImpl implements UserService {
 
         String hashPassword = passwordEncoder.encode(newUserRequest.getPassword());
         UserEntity userEntity = userMapper.toEntity(newUserRequest);
-
+        String imageUrl = s3Service.uploadBase64(newUserRequest.getImageUrl(),"user"+newUserRequest.getIdentification());
         userEntity.setPassword(hashPassword);
         userEntity.setRol(rol);
         userEntity.setOrganization(organizationEntity);
+        userEntity.setImageUrl(imageUrl);
         userEntity = repository.save(userEntity);
         walletService.create(userEntity);
         return userMapper.toResponse(userEntity);
@@ -120,6 +127,12 @@ public class UserServiceImpl implements UserService {
         userToUpdate.setActive(!currentState);
         repository.save(userToUpdate);
         return userMapper.toResponse(userToUpdate);
+    }
+
+    @Override
+    public UserEntity getByIdentification(String identification) throws NotFoundException {
+        return repository.findByIdentification(identification)
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
 }

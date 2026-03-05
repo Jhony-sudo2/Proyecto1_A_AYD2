@@ -61,7 +61,7 @@ public class ActivityServiceImpl implements ActivityService {
         if (proposal.getState() != ProposalState.APPROVED) {
             throw new IllegalStateException("Only approved proposals can be scheduled as activities");
         }
-        if (activityRepository.existsByRoomIdAndTimeRange(room.getId(), startDate, endDate)) {
+        if (activityRepository.existsOverlap(room.getId(), startDate, endDate)) {
             throw new DuplicatedEntityException("The room is already booked for the given time range");
         }
         if (activityRepository.existsByProposalId(proposal.getId())) {
@@ -86,14 +86,14 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public List<ActivityResponse> getActivitiesByCongressId(Long congressId) throws NotFoundException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getActivitiesByCongressId'");
+        List<ActivityEntity> activities = activityRepository.findByProposalCongressId(congressId);
+        return activityMapper.toActivityResponseList(activities);
     }
 
     @Override
     public List<ActivityResponse> getActivitiesByTypeAndCongressId(ActivityType type, Long congressId)
             throws NotFoundException {
-        List<ActivityEntity> activities = activityRepository.findByTypeAndCongressId(type, congressId);
+        List<ActivityEntity> activities = activityRepository.findByTypeAndProposalCongressId(type, congressId);
         return activityMapper.toActivityResponseList(activities);
     }
 
@@ -123,27 +123,35 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public List<ProposalResponse> getProposalsByCongressId(Long congressId) throws NotFoundException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getProposalsByCongressId'");
+        List<ProposalEntity> proposals = proposalRepository.findByCongressId(congressId);
+        return activityMapper.toProposalResponseList(proposals);
     }
 
     @Override
     public List<ProposalResponse> getProposalsByStateAndCongressId(ProposalState state, Long congressId)
             throws NotFoundException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getProposalsByStateAndCongressId'");
+        List<ProposalEntity> proposals = proposalRepository.findByCongressId(congressId);
+        return activityMapper.toProposalResponseList(proposals.stream()
+                .filter(p -> p.getState() == state)
+                .toList());
     }
 
     @Override
     public List<ProposalResponse> getProposalByUserId(Long userId) throws NotFoundException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getProposalByUserId'");
+        List<ProposalEntity> proposals = proposalRepository.findByUserId(userId);
+        return activityMapper.toProposalResponseList(proposals);
     }
 
     @Override
     public ProposalEntity getProposalById(Long id) throws NotFoundException {
         return proposalRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Proposal not found with id: " + id));
+    }
+
+    @Override
+    public ActivityEntity getActivityById(Long id) throws NotFoundException {
+        return activityRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Activity not found with id: " + id));
     }
 
 }

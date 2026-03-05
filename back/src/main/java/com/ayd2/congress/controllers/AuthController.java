@@ -14,6 +14,8 @@ import com.ayd2.congress.exceptions.NotAuthorizedException;
 import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.services.Auth.AuthService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -21,8 +23,8 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) throws NotFoundException, NotAuthorizedException{
-        LoginResponse response = authService.Login(request);
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) throws NotFoundException, NotAuthorizedException{
+        LoginResponse response = authService.authenticateAndGetToken(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 

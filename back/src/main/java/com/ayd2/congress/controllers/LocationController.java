@@ -36,6 +36,12 @@ public class LocationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping
+    public ResponseEntity<List<LocationResponse>> getAllLocations(){
+        List<LocationResponse> response = locationService.getAllLocations();
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/{id}/rooms")
     public ResponseEntity<RoomResponse> createRoom(@PathVariable Long id,@Validated @RequestBody NewRoomRequest request) throws NotFoundException, DuplicatedEntityException{
         RoomResponse response = locationService.createRoom(request, id);

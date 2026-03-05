@@ -97,5 +97,11 @@ public class LocationServiceImpl implements LocationService{
         List<ConferenceRoomEntity> rooms = roomRepository.findByLocationId(location.getId());
         return locationMapper.toRoomResponseList(rooms);
     }
+
+    @Override
+    public List<LocationResponse> getAllLocations() {
+        List<LocationEntity> locations = locationRepository.findAll();
+        return locationMapper.toResponseList(locations);
+    }
     
 }

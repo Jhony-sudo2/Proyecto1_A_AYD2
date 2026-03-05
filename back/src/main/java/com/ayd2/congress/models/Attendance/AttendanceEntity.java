@@ -2,6 +2,7 @@ package com.ayd2.congress.models.Attendance;
 
 import com.ayd2.congress.compositePrimaryKeys.AttendanceId;
 import com.ayd2.congress.models.Activities.ActivityEntity;
+import com.ayd2.congress.models.Enums.AttendanceType;
 import com.ayd2.congress.models.User.UserEntity;
 
 import jakarta.persistence.Column;
@@ -24,14 +25,13 @@ public class AttendanceEntity {
 
     @MapsId("userId")
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    @Column(nullable = false)
+    @JoinColumn(name = "user_id",nullable = false)
     private UserEntity user;
 
     @MapsId("activityId")
     @ManyToOne
-    @JoinColumn(name = "activity_id")
-    @Column(nullable = false)
+    @JoinColumn(name = "activity_id",nullable = false)
     private ActivityEntity activity;
-
+    @Column(nullable = false)
+    private AttendanceType type;
 }

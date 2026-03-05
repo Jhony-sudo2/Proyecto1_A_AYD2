@@ -7,6 +7,7 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 @Entity
@@ -14,9 +15,11 @@ import jakarta.persistence.Table;
 public class ScientificCommitteeEntity {
     @EmbeddedId
     private CommiteeId id;
+    @MapsId("userId")
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
     private UserEntity user;
+    @MapsId("congressId")
     @ManyToOne
     @JoinColumn(name = "congress_id",nullable = false)
     private CongressEntity congress;

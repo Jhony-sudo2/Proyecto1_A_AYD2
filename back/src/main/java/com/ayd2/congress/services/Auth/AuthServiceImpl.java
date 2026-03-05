@@ -1,7 +1,9 @@
 package com.ayd2.congress.services.Auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import com.ayd2.congress.dtos.Auth.LoginRequest;
@@ -10,27 +12,20 @@ import com.ayd2.congress.exceptions.NotAuthorizedException;
 import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.models.User.UserEntity;
 import com.ayd2.congress.services.User.UserService;
+import com.ayd2.congress.services.jwt.JwtService;
 
 @Service
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
     private final UserService userService;
-    private final PasswordEncoder encoder;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public AuthServiceImpl(UserService userService,PasswordEncoder encoder,JwtService jwtService){
-        this.encoder = encoder;
+    public AuthServiceImpl(UserService userService, JwtService jwtService,
+            AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.jwtService = jwtService;
-    }
-
-    @Override
-    public LoginResponse Login(LoginRequest request) throws NotFoundException, NotAuthorizedException {
-        UserEntity user = userService.getByEmail(request.getEmail());
-        if (!encoder.matches(request.getPassword(), user.getPassword())) 
-           throw new NotAuthorizedException("invalid credentials");
-        String token = jwtService.generateToken(user);
-        return new LoginResponse(token, "Bearer", jwtService.getExpSeconds());
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -38,5 +33,22 @@ public class AuthServiceImpl implements AuthService{
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'logOut'");
     }
-    
+
+    @Override
+    public LoginResponse authenticateAndGetToken(LoginRequest request)
+            throws NotFoundException, NotAuthorizedException {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        } catch (AuthenticationException ex) {
+            throw new NotAuthorizedException("invalid credentials");
+        }
+
+        UserEntity user = userService.getByEmail(request.getEmail());
+        jwtService.updateTokenExpiration(user.getEmail());
+
+        String token = jwtService.generateToken(user);
+        return new LoginResponse(token, "Bearer", jwtService.getExpSeconds());
+    }
+
 }

@@ -22,8 +22,9 @@ import com.ayd2.congress.exceptions.NotAuthorizedException;
 import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.models.User.UserEntity;
 import com.ayd2.congress.services.Auth.AuthServiceImpl;
-import com.ayd2.congress.services.Auth.JwtService;
+
 import com.ayd2.congress.services.User.UserService;
+import com.ayd2.congress.services.jwt.JwtService;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceImplTest {
@@ -56,7 +57,7 @@ public class AuthServiceImplTest {
         when(jwtService.getExpSeconds()).thenReturn(EXPIRES_IN);
 
         // ACT 
-        LoginResponse result = service.Login(request);
+        LoginResponse result = service.authenticateAndGetToken(request);
 
         // ASSERT 
         assertAll(
@@ -84,7 +85,7 @@ public class AuthServiceImplTest {
         when(encoder.matches(USER_PASSWORD, HASHED_PASSWORD)).thenReturn(false);
 
         //  ACT ASSERT
-        assertThrows(NotAuthorizedException.class, () -> service.Login(request));
+        assertThrows(NotAuthorizedException.class, () -> service.authenticateAndGetToken(request));
 
         verify(userService).getByEmail(USER_EMAIL);
         verify(encoder).matches(USER_PASSWORD, HASHED_PASSWORD);

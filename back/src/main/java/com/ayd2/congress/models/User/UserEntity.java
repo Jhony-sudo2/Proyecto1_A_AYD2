@@ -1,5 +1,7 @@
 package com.ayd2.congress.models.User;
 
+import java.time.LocalDateTime;
+
 import com.ayd2.congress.models.Organization.OrganizationEntity;
 
 import jakarta.persistence.Column;
@@ -45,5 +47,6 @@ public class UserEntity {
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private OrganizationEntity organization;
-
+    @Column
+    private LocalDateTime tokenExpiration;
 }

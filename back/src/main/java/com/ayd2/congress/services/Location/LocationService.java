@@ -21,4 +21,5 @@ public interface LocationService {
     ConferenceRoomEntity getRoomById(Long id) throws NotFoundException;
     RoomResponse updateRoom(Long id,UpdateRoom request) throws NotFoundException, DuplicatedEntityException;
     List<RoomResponse> getRoomsByLocationId(Long locationId) throws NotFoundException;
+    List<LocationResponse> getAllLocations();
 }

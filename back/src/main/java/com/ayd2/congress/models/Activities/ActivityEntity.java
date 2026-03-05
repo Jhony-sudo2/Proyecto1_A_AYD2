@@ -7,6 +7,8 @@ import com.ayd2.congress.models.Enums.ActivityType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,6 +31,7 @@ public class ActivityEntity {
     @Column(nullable = false)
     private LocalDateTime endDate;
     private boolean state = false;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ActivityType type;
     @ManyToOne

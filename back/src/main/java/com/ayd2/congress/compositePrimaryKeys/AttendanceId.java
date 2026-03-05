@@ -18,6 +18,8 @@ public class AttendanceId implements Serializable {
     @Column(name = "attendance_type", nullable = false, length = 30)
     private AttendanceType type;
 
+    public AttendanceId() {
+    }
     public AttendanceId(Long userId, Long activityId, AttendanceType type) {
         this.userId = userId;
         this.activityId = activityId;
