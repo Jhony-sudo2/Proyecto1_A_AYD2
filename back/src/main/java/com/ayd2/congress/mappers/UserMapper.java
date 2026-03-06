@@ -1,10 +1,7 @@
 package com.ayd2.congress.mappers;
 
-<<<<<<< HEAD
 import java.util.List;
 
-=======
->>>>>>> a16aa4d35b165f85613b5c1e86454c4e181d535e
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
