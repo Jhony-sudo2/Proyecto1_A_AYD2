@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { UserService } from '../../Services/User/user.service';
-import { CreateUser } from '../../interfaces/User';
 import { Organization } from '../../interfaces/Organization';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';

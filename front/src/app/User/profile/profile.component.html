@@ -1,1 +1,248 @@
-<p>profile works!</p>
+<div class="min-h-screen bg-slate-950 px-4 py-12"
+  style="background-image: radial-gradient(ellipse at 20% 50%, rgba(56, 189, 248, 0.07) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);">
+
+  <div class="max-w-5xl mx-auto">
+
+    <!-- Header perfil -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 flex flex-col sm:flex-row items-center gap-6">
+      <div class="relative">
+        <img [src]="usuario.imageUrl || 'https://placehold.co/100x100/1e293b/475569?text=👤'" [alt]="usuario.name"
+          onerror="this.src='https://placehold.co/100x100/1e293b/475569?text=👤'"
+          class="w-24 h-24 rounded-2xl object-cover border-2 border-slate-700" />
+        <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-slate-900"
+          [ngClass]="usuario.active ? 'bg-emerald-400' : 'bg-slate-600'"></span>
+      </div>
+      <div class="text-center sm:text-left flex-1">
+        <h1 class="text-2xl font-bold text-white">{{ usuario.name }} {{ usuario.lastName }}</h1>
+        <p class="text-slate-400 text-sm">{{ usuario.email }}</p>
+        <div class="flex flex-wrap justify-center sm:justify-start gap-3 mt-2">
+          <span class="text-xs text-slate-500 bg-slate-800 px-3 py-1 rounded-full">{{ usuario.nacionality }}</span>
+          <span class="text-xs text-slate-500 bg-slate-800 px-3 py-1 rounded-full">{{ usuario.phone }}</span>
+          <span *ngIf="usuario.organizationName"
+            class="text-xs text-sky-400 bg-sky-500/10 border border-sky-500/20 px-3 py-1 rounded-full">{{
+            usuario.organizationName }}</span>
+        </div>
+      </div>
+      <!-- Wallet badge -->
+      <div
+        class="bg-gradient-to-br from-sky-500/20 to-indigo-500/20 border border-sky-500/20 rounded-2xl p-4 text-center min-w-36">
+        <p class="text-slate-400 text-xs mb-1">Saldo disponible</p>
+        <p class="text-3xl font-bold text-white">Q{{ wallet.value | number:'1.2-2' }}</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-6 bg-slate-900 border border-slate-800 rounded-2xl p-1.5">
+      <button *ngFor="let tab of tabs" (click)="activeTab = tab.id"
+        class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200" [ngClass]="activeTab === tab.id
+          ? 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-md'
+          : 'text-slate-500 hover:text-slate-300'">
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- TAB: Editar perfil -->
+    <div *ngIf="activeTab === 'profile'"
+      class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl shadow-black/30">
+      <h2 class="text-white font-bold text-lg mb-6">Actualizar perfil</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Nombre</label>
+          <input type="text" [(ngModel)]="usuarioUpadte.name" name="name"
+            class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Apellido</label>
+          <input type="text" [(ngModel)]="usuarioUpadte.lastName" name="lastName"
+            class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Correo</label>
+          <input type="email" [(ngModel)]="usuarioUpadte.email" name="email"
+            class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Teléfono</label>
+          <input type="tel" [(ngModel)]="usuarioUpadte.phone" name="phone"
+            class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+        </div>
+      </div>
+
+      <!-- Imagen -->
+      <div class="mb-6">
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Foto de perfil</label>
+        <label
+          class="flex items-center gap-3 w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 cursor-pointer hover:border-sky-500 transition-all duration-200 group">
+          <svg class="w-5 h-5 text-slate-500 group-hover:text-sky-400 transition-colors shrink-0" fill="none"
+            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+          </svg>
+          <span class="text-sm truncate" [ngClass]="usuarioUpadte.image ? 'text-sky-400' : 'text-slate-600'">
+            {{ usuarioUpadte.image ? 'Imagen cargada ✓' : 'Selecciona una imagen...' }}
+          </span>
+          <input type="file" accept="image/*" (change)="onImageSelected($event)" class="hidden" />
+        </label>
+      </div>
+
+      <button (click)="guardarPerfil()"
+        class="w-full py-3 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 shadow-lg shadow-sky-500/20 active:scale-95 transition-all duration-200">
+        Guardar cambios
+      </button>
+    </div>
+
+    <!-- TAB: Contraseña -->
+    <div *ngIf="activeTab === 'password'"
+      class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl shadow-black/30">
+      <h2 class="text-white font-bold text-lg mb-6">Cambiar contraseña</h2>
+
+      <div class="max-w-md mx-auto space-y-5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Contraseña
+            actual</label>
+          <div class="relative">
+            <input [type]="showCurrent ? 'text' : 'password'" [(ngModel)]="updatePassword.currentPassword"
+              name="currentPassword" placeholder="••••••••"
+              class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+            <button type="button" (click)="showCurrent = !showCurrent"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-slate-300">
+              <svg *ngIf="!showCurrent" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <svg *ngIf="showCurrent" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Nueva
+            contraseña</label>
+          <div class="relative">
+            <input [type]="showNew ? 'text' : 'password'" [(ngModel)]="updatePassword.newPassword" name="newPassword"
+              placeholder="••••••••"
+              class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+            <button type="button" (click)="showNew = !showNew"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-slate-300">
+              <svg *ngIf="!showNew" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <svg *ngIf="showNew" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button (click)="cambiarPassword()"
+          class="w-full py-3 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 shadow-lg shadow-sky-500/20 active:scale-95 transition-all duration-200">
+          Actualizar contraseña
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB: Wallet -->
+    <div *ngIf="activeTab === 'wallet'" class="space-y-6">
+
+      <!-- Saldo + Recargar -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Saldo -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-3">Saldo actual</p>
+          <div class="flex items-end gap-2">
+            <span class="text-5xl font-bold text-white">Q{{ wallet.value | number:'1.2-2' }}</span>
+          </div>
+          <p class="text-slate-600 text-xs mt-2">ID Wallet: #{{ wallet.id }}</p>
+        </div>
+
+        <!-- Recargar -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-3">Recargar saldo</p>
+          <div class="flex gap-2 mb-4">
+            <button *ngFor="let monto of [50, 100, 200, 500]" (click)="rechargeWallet.amount = monto"
+              class="flex-1 py-2 rounded-xl text-xs font-semibold transition-all duration-200 border" [ngClass]="rechargeWallet.amount === monto
+                ? 'bg-sky-500/20 text-sky-400 border-sky-500/40'
+                : 'text-slate-500 border-slate-700 hover:border-slate-500 hover:text-slate-300'">
+              Q{{ monto }}
+            </button>
+          </div>
+          <div class="relative mb-4">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 font-bold text-sm">Q</span>
+            <input type="number" [(ngModel)]="rechargeWallet.amount" name="amount" min="1" placeholder="Otro monto"
+              class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl pl-8 pr-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+          </div>
+          <!-- Fecha manual -->
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Fecha de
+              recarga</label>
+            <input type="datetime-local" [(ngModel)]="rechargeWallet.date" name="date"
+              class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+          </div>
+          <button (click)="recargar()"
+            class="w-full py-3 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 shadow-lg shadow-sky-500/20 active:scale-95 transition-all duration-200">
+            Recargar
+          </button>
+        </div>
+      </div>
+
+      <!-- Historial -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-white font-bold text-lg">Historial de recargas</h2>
+          <button (click)="cargarHistorial()"
+            class="text-xs text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Actualizar
+          </button>
+        </div>
+
+        <div *ngIf="historyRecharges.length === 0" class="text-center py-12 text-slate-600">
+          <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" stroke-width="1.5"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75" />
+          </svg>
+          <p class="text-sm">Sin recargas aún</p>
+          <p class="text-xs mt-1">Pulsa "Actualizar" para cargar el historial</p>
+        </div>
+
+        <div class="space-y-3">
+          <div *ngFor="let r of historyRecharges"
+            class="flex items-center justify-between bg-slate-800 rounded-xl px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-white text-sm font-semibold">Recarga</p>
+                <p class="text-slate-500 text-xs">{{ r.date | date:'dd MMM yyyy, HH:mm' }}</p>
+              </div>
+            </div>
+            <span class="text-emerald-400 font-bold">+Q{{ r.amount | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

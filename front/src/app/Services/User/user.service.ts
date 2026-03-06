@@ -3,7 +3,8 @@ import { environemnt } from '../../../environment/Environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Organization } from '../../interfaces/Organization';
-import { CreateUser } from '../../interfaces/User';
+import { CreateUser, UpdatePassword, UpdateUser, User } from '../../interfaces/User';
+import { Wallet, WalletRecharge } from '../../interfaces/Wallet';
 
 @Injectable({
   providedIn: 'root'
@@ -17,9 +18,42 @@ export class UserService {
     return this.http.post(this.baseUrl,data)
   }
 
+  getUserById(id:number):Observable<User>{
+    return this.http.get<User>(`${this.baseUrl}/${id}`)
+  }
+
+  changeState(userId:number){
+    return this.http.patch<User>(`${this.baseUrl}/${userId}`,{})
+  }
+
+  getAllUser():Observable<User[]>{
+    return this.http.get<User[]>(this.baseUrl)
+  }
+
+  getWalletByUserId(userId:number):Observable<Wallet>{
+    return this.http.get<Wallet>(`${this.baseUrl}/${userId}/wallet`)
+  }
+
+  getRechargeHistory(userId:number):Observable<WalletRecharge>{
+    return this.http.get<WalletRecharge>(`${this.baseUrl}/${userId}/wallet/recharges`)
+  }
+
+  rechargeWallet(data:WalletRecharge,userId:number):Observable<Wallet>{
+    return this.http.put<Wallet>(`${this.baseUrl}/${userId}/wallet`,data)
+  }
+
   getOrganizations():Observable<Organization[]>{
     return this.http.get<Organization[]>(this.organizationUrl)
   }
+  udpatePassword(data:UpdatePassword,id:number){
+    return this.http.put(`${this.baseUrl}/${id}/password`,data)
+  }
 
+  updateUser(data:UpdateUser,id:number){
+    return this.http.put(`${this.baseUrl}/${id}`,data)
+  }
 
+  getOrganizationByUserId(id:number):Observable<Organization>{
+    return this.http.get<Organization>(`${this.organizationUrl}/${id}`)
+  }
 }

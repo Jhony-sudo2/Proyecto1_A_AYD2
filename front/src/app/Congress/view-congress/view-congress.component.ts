@@ -25,10 +25,10 @@ export class ViewCongressComponent {
     })
   }
   goToDetail(id: number) {
-    this.router.navigate(['/congress', id]);
+    this.router.navigate(['/congressDetails', id]);
   }
 
   enroll(congressId: number) {
-    // lógica de inscripción/pago cuando la tengas
+    this.router.navigate(["inscription",congressId]);
   }
 }

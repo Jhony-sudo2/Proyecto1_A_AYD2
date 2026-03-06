@@ -8,8 +8,8 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
   if (!token) return next(req);
 
-  // Opcional: excluir /auth y /users
-  if (req.url.includes('/auth') || req.url.includes('/users')) {
+  // excluir /auth 
+  if (req.url.includes('/auth')) {
     return next(req);
   }
 

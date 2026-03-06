@@ -20,5 +20,6 @@ export interface CongressResponse{
    endDate: Date,
    endCallDate: Date,
    organizationName: string,
+   locationId:number
    locationName: string
 }
