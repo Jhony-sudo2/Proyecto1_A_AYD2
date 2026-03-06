@@ -31,7 +31,6 @@ import jakarta.validation.Valid;
 @RequestMapping("/users")
 public class UserController {
     private final UserService service;
-
     @Autowired
     public UserController(UserService service) {
         this.service = service;
