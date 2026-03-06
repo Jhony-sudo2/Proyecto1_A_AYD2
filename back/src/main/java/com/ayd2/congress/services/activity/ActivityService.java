@@ -6,6 +6,7 @@ import com.ayd2.congress.dtos.acitivty.ActivityResponse;
 import com.ayd2.congress.dtos.acitivty.NewActivityRequest;
 import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
+import com.ayd2.congress.dtos.acitivty.UpdateProposal;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.InvalidDateRangeException;
 import com.ayd2.congress.exceptions.NotFoundException;
@@ -24,5 +25,7 @@ public interface ActivityService {
     List<ProposalResponse> getProposalsByStateAndCongressId(ProposalState state, Long congressId) throws NotFoundException;
     List<ProposalResponse> getProposalByUserId(Long userId) throws NotFoundException;
     ActivityEntity getActivityById(Long id) throws NotFoundException;
+    ProposalResponse updateProposal(Long id,UpdateProposal state) throws NotFoundException;
+    ProposalResponse getProposalResponseById(Long id) throws NotFoundException;
     
 }

@@ -16,4 +16,5 @@ public class CongressResponse {
     private LocalDate endCallDate;
     private String organizationName;
     private String locationName;
+    private Long locationId;
 }

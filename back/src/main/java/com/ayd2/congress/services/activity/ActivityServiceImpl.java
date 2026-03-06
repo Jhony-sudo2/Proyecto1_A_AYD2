@@ -10,6 +10,7 @@ import com.ayd2.congress.dtos.acitivty.ActivityResponse;
 import com.ayd2.congress.dtos.acitivty.NewActivityRequest;
 import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
+import com.ayd2.congress.dtos.acitivty.UpdateProposal;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.InvalidDateRangeException;
 import com.ayd2.congress.exceptions.NotFoundException;
@@ -112,10 +113,8 @@ public class ActivityServiceImpl implements ActivityService {
         if (exists)
             throw new DuplicatedEntityException("User has already a pending proposal for this congress");
 
-        ProposalEntity proposal = new ProposalEntity();
+        ProposalEntity proposal = activityMapper.toProposalEntity(request);
         proposal.setUser(user);
-        proposal.setName(request.getName());
-        proposal.setDescription(request.getDescription());
         proposal.setCongress(congress);
         proposalRepository.save(proposal);
         return activityMapper.toProposalResponse(proposal);
@@ -152,6 +151,21 @@ public class ActivityServiceImpl implements ActivityService {
     public ActivityEntity getActivityById(Long id) throws NotFoundException {
         return activityRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Activity not found with id: " + id));
+    }
+
+    @Override
+    public ProposalResponse updateProposal(Long id, UpdateProposal state) throws NotFoundException {
+        ProposalEntity proposalEntity = getProposalById(id);
+        if (proposalEntity.getState() == ProposalState.REJECTED) 
+            throw new NotFoundException("Proposal was rejected");
+        proposalEntity.setState(state.getState());
+        proposalRepository.save(proposalEntity);
+        return activityMapper.toProposalResponse(proposalEntity);
+    }
+
+    @Override
+    public ProposalResponse getProposalResponseById(Long id) throws NotFoundException {
+        return activityMapper.toProposalResponse(getProposalById(id));
     }
 
 }

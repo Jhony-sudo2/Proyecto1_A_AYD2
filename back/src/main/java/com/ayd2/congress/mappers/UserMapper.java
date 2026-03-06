@@ -1,5 +1,7 @@
 package com.ayd2.congress.mappers;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -15,12 +17,13 @@ public interface UserMapper {
             @Mapping(target = "rol", ignore = true),
             @Mapping(target = "organization", ignore = true),
             @Mapping(target = "password", ignore = true),
-            @Mapping(target = "active", constant = "true")
+            @Mapping(target = "active", constant = "true"),
+            @Mapping(target = "tokenExpiration",ignore = true)
     })
     UserEntity toEntity(NewUserRequest dto);
     @Mappings({
-            @Mapping(target = "rolId", source = "rol.id"),
-            @Mapping(target = "organizationId", source = "organization.id")
+            @Mapping(target = "organizationName", source = "organization.name")
     })
     UserResponse toResponse(UserEntity entity);
+    List<UserResponse> toResponseList(List<UserEntity> entities);
 }

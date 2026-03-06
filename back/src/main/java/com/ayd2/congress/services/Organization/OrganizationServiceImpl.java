@@ -10,26 +10,30 @@ import com.ayd2.congress.dtos.Organization.OrganizationResponse;
 import com.ayd2.congress.dtos.Organization.OrganizationUpdate;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.mappers.OrganizationMapper;
 import com.ayd2.congress.models.Organization.OrganizationEntity;
 import com.ayd2.congress.repositories.OrganizationRepository;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService{
     private final OrganizationRepository repository;
+    private final OrganizationMapper mapper;
 
     @Autowired
-    public OrganizationServiceImpl(OrganizationRepository repository) {
+    public OrganizationServiceImpl(OrganizationRepository repository,OrganizationMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
+
 
     @Override
     public OrganizationResponse create(NewOrganizationRequest request) throws DuplicatedEntityException {
         if(repository.existsByName(request.getName())){
             throw new DuplicatedEntityException("Organization with name "+request.getName()+" already exists");
         }
-        OrganizationEntity entity = request.createEntity();
+        OrganizationEntity entity = mapper.toEntity(request);
         entity = repository.save(entity);
-        return new OrganizationResponse(entity);
+        return mapper.toResponse(entity);
     }
 
     @Override
@@ -39,7 +43,8 @@ public class OrganizationServiceImpl implements OrganizationService{
 
     @Override
     public List<OrganizationResponse> getAll() {
-        return repository.findAll().stream().map(OrganizationResponse::new).toList();
+        List<OrganizationEntity> list = repository.findAll();
+        return mapper.toResponseList(list);
     }
 
     @Override
@@ -53,7 +58,13 @@ public class OrganizationServiceImpl implements OrganizationService{
         organizationUpdate.setName(request.getName());
         organizationUpdate.setImage(request.getImage());
         organizationUpdate.setCanCreateCongress(request.isCanCreateCongress());
-        return new OrganizationResponse(repository.save(organizationUpdate));
+        repository.save(organizationUpdate);
+        return mapper.toResponse(organizationUpdate);
+    }
+
+    @Override
+    public OrganizationResponse getByIdResponse(Long id) throws NotFoundException {
+        return mapper.toResponse(getById(id));
     }
 
     

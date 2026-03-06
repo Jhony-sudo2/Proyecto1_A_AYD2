@@ -26,7 +26,6 @@ public class UserUpdate {
         userToUpdate.setName(name);
         userToUpdate.setLastName(lastName);
         userToUpdate.setEmail(email);
-        userToUpdate.setImageUrl(image);
         userToUpdate.setPhone(phone);
         return userToUpdate;
     }

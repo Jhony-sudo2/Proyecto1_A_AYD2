@@ -25,6 +25,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.ayd2.congress.security.jwtfilter.JwtAuthenticationFilter;
 
+
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
@@ -47,9 +48,8 @@ public class Security {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.POST, "/auth", "/auth").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/organizations").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/congresses").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/organizations").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/congresses").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -73,7 +73,7 @@ public class Security {
         config.setAllowedOrigins(List.of("*"));
 
         // Permitir cualquier método
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
 
         // Permitir cualquier header
         config.setAllowedHeaders(List.of("*"));

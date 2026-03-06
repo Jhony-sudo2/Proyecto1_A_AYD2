@@ -6,12 +6,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.ayd2.congress.dtos.acitivty.ActivityResponse;
+import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
 import com.ayd2.congress.models.Activities.ActivityEntity;
 import com.ayd2.congress.models.Activities.ProposalEntity;
 
 @Mapper(componentModel = "spring")
 public interface ActivityMapper {
+
+
     @Mapping(target = "name", source = "proposal.name")
     @Mapping(target = "description", source = "proposal.description")
     ActivityResponse toActivityResponse(ActivityEntity entity);
@@ -22,5 +25,9 @@ public interface ActivityMapper {
     ProposalResponse toProposalResponse(ProposalEntity entity);
     List<ProposalResponse> toProposalResponseList(List<ProposalEntity> entities);
 
-
+    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "congress",ignore = true)
+    @Mapping(target = "user",ignore = true)
+    @Mapping(target ="state",ignore = true)
+    ProposalEntity toProposalEntity(NewProposalRequest request);
 }

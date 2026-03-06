@@ -12,6 +12,5 @@ public class UserResponse {
     private String imageUrl;
     private boolean active;
     private String nacionality;
-    private Long rolId;
-    private Long organizationId;
+    private String organizationName;
 }

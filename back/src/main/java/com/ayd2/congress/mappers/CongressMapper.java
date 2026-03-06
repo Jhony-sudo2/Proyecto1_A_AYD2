@@ -17,6 +17,7 @@ public interface CongressMapper {
     @Mapping(target = "imageUrl",ignore = true)
     CongressEntity toEntity(NewCongressRequest request);
 
+    @Mapping(target = "locationId",source = "location.id")
     @Mapping(target = "organizationName",source = "organization.name")
     @Mapping(target = "locationName",source =  "location.name")
     CongressResponse toResponse(CongressEntity entity);

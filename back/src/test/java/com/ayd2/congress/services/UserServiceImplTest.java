@@ -51,6 +51,7 @@ public class UserServiceImplTest {
         private static final String NACIONALITY = "42882130";
         private static final Long ROL_ID = 1L;
         private static final Long ORGANIZATION_ID = 1L;
+        private static final String ORGANIZATION_NAME = "USAC";
         private static final String IMAGE_URL = "example.png";
         private static final String PASSWORD = "password123";
         private static final String NEW_PASSWORD = "newPassword123";
@@ -121,7 +122,7 @@ public class UserServiceImplTest {
                 UserResponse response = new UserResponse(
                                 USER_ID, IDENTIFICATION_NUMBER, USER_NAME, USER_LAST_NAME, EMAIL, PHONE, IMAGE_URL,
                                 true, NACIONALITY,
-                                ROL_ID, ORGANIZATION_ID);
+                                 ORGANIZATION_NAME);
                 when(userMapper.toResponse(saved)).thenReturn(response);
 
                 // ACT
@@ -144,8 +145,7 @@ public class UserServiceImplTest {
                                 () -> assertEquals(ORGANIZATION_ID, arg.getOrganization().getId()),
                                 () -> assertEquals(USER_ID, result.getId()),
                                 () -> assertEquals(EMAIL, result.getEmail()),
-                                () -> assertEquals(ROL_ID, result.getRolId()),
-                                () -> assertEquals(ORGANIZATION_ID, result.getOrganizationId()));
+                                () -> assertEquals(ORGANIZATION_NAME, result.getOrganizationName()));
         }
 
         @Test
@@ -169,7 +169,7 @@ public class UserServiceImplTest {
         }
 
         @Test
-        void updateUserTest() throws NotFoundException, DuplicatedEntityException {
+        void updateUserTest() throws NotFoundException, DuplicatedEntityException, IOException {
                 // ARRANGE
                 UserUpdate update = new UserUpdate(USER_NAME, EMAIL, USER_LAST_NAME, PHONE, IMAGE_URL);
                 UserEntity entity = new UserEntity();
@@ -185,7 +185,7 @@ public class UserServiceImplTest {
 
                 OrganizationEntity organization = new OrganizationEntity();
                 organization.setId(ORGANIZATION_ID);
-
+                organization.setName(ORGANIZATION_NAME);
                 entity.setRol(rol);
                 entity.setOrganization(organization);
 
@@ -205,8 +205,7 @@ public class UserServiceImplTest {
                                 IMAGE_URL,
                                 entity.isActive(),
                                 entity.getNacionality(),
-                                rol.getId(),
-                                organization.getId());
+                                organization.getName());
                 when(userMapper.toResponse(any(UserEntity.class))).thenReturn(mappedResponse);
 
                 // ACT

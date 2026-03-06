@@ -1,6 +1,7 @@
 package com.ayd2.congress.services.User;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +36,6 @@ public class UserServiceImpl implements UserService {
     private final WalletService walletService;
     private final S3Service s3Service;
 
-
     @Autowired
     public UserServiceImpl(UserRepository userRepository, RolServiceImpl rolService,
             OrganizationServiceImpl organizationService, PasswordEncoder passwordEncoder, UserMapper userMapper,
@@ -51,7 +51,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserResponse create(NewUserRequest newUserRequest) throws NotFoundException, DuplicatedEntityException, IOException {
+    public UserResponse create(NewUserRequest newUserRequest)
+            throws NotFoundException, DuplicatedEntityException, IOException {
         if (repository.existsByEmail(newUserRequest.getEmail())) {
             throw new DuplicatedEntityException("Email: " + newUserRequest.getEmail() + " already exists");
         }
@@ -64,7 +65,8 @@ public class UserServiceImpl implements UserService {
 
         String hashPassword = passwordEncoder.encode(newUserRequest.getPassword());
         UserEntity userEntity = userMapper.toEntity(newUserRequest);
-        String imageUrl = s3Service.uploadBase64(newUserRequest.getImageUrl(),"user"+newUserRequest.getIdentification());
+        String imageUrl = s3Service.uploadBase64(newUserRequest.getImageUrl(),
+                "user" + newUserRequest.getIdentification());
         userEntity.setPassword(hashPassword);
         userEntity.setRol(rol);
         userEntity.setOrganization(organizationEntity);
@@ -86,12 +88,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse update(UserUpdate userUpdateRequest, Long id)
-            throws NotFoundException, DuplicatedEntityException {
+            throws NotFoundException, DuplicatedEntityException, IOException {
         UserEntity userToUpdate = getById(id);
         if (repository.existsByEmailAndIdNot(userUpdateRequest.getEmail(), id)) {
             throw new DuplicatedEntityException("Email already exist");
         }
         userUpdateRequest.updateUser(userToUpdate);
+        if (userUpdateRequest.getImage() == "") {
+            String image = s3Service.uploadBase64(userUpdateRequest.getImage(), "USER_" + userToUpdate.getId());
+            userToUpdate.setImageUrl(image);
+        }
         repository.save(userToUpdate);
         return userMapper.toResponse(userToUpdate);
     }
@@ -133,6 +139,12 @@ public class UserServiceImpl implements UserService {
     public UserEntity getByIdentification(String identification) throws NotFoundException {
         return repository.findByIdentification(identification)
                 .orElseThrow(() -> new NotFoundException("User not found"));
+    }
+
+    @Override
+    public List<UserResponse> getAllUsers() {
+        List<UserEntity> entities = repository.findAll();
+        return userMapper.toResponseList(entities);
     }
 
 }

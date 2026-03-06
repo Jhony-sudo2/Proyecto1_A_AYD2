@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ayd2.congress.dtos.Organization.NewOrganizationRequest;
 import com.ayd2.congress.dtos.Organization.OrganizationResponse;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
+import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.services.Organization.OrganizationService;
 
 import jakarta.validation.Valid;
@@ -35,6 +37,12 @@ public class OrganizationController {
     public ResponseEntity<List<OrganizationResponse>> getAllOrganizations() {
         List<OrganizationResponse> organizations = organizationService.getAll();
         return ResponseEntity.ok(organizations);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OrganizationResponse> getOrganizationById(@PathVariable Long id) throws NotFoundException{
+        OrganizationResponse response = organizationService.getByIdResponse(id);
+        return ResponseEntity.ok(response);
     }
 
 }

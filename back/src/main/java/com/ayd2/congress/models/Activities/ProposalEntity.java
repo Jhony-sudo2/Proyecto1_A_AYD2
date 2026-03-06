@@ -7,6 +7,8 @@ import com.ayd2.congress.models.User.UserEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,8 +36,10 @@ public class ProposalEntity {
     private String name;
     @Column(nullable = false)
     private String description;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProposalState state = ProposalState.PENDING;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ActivityType type;
 

@@ -42,10 +42,10 @@ public class JwtServiceImpl implements JwtService {
     public String generateToken(UserEntity user) {
         Instant now = Instant.now();
 
-        String subject = String.valueOf(user.getId());
+        //String subject = String.valueOf(user.getId());
 
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(user.getEmail())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusSeconds(expSeconds)))
                 .addClaims(Map.of(
@@ -68,7 +68,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String getUsername(String token) {
         Claims claims = parseAndValidate(token);
-        return claims.get("email", String.class);
+        return claims.getSubject();
     }
 
     @Override
