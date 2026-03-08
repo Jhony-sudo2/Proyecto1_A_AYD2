@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivityService } from '../../Services/Activity/activity.service';
 import { LocationService } from '../../Services/Location/location.service';
-import { Activity, CreateActivity, Proposal } from '../../interfaces/Activity';
+import { Activity, CreateActivity, Proposal, updateActivity } from '../../interfaces/Activity';
 import { Room } from '../../interfaces/Location';
 import { CongressResponse } from '../../interfaces/Congress';
 import { ActivatedRoute } from '@angular/router';
@@ -19,10 +19,12 @@ import Swal from 'sweetalert2';
 })
 export class CreateActivityComponent {
   activityCreate: CreateActivity = {} as CreateActivity
+  activityUpdate: updateActivity = {} as updateActivity
   activities: Activity[] = []
   rooms: Room[] = []
   congress: CongressResponse = {} as CongressResponse
   proposals: Proposal[] = []
+  editingId: number | null = null;
   constructor(private service: ActivityService, private locationService: LocationService, private route: ActivatedRoute, private congressService: CongressService) { }
 
   ngOnInit() {
@@ -61,5 +63,60 @@ export class CreateActivityComponent {
     });
   }
 
+  
 
+  startEdit(activity: Activity) {
+    this.editingId = activity.id;
+    this.activityUpdate = {
+      name: activity.name,
+      roomId: activity.roomId,
+      capacity: activity.capacity,
+      startDate: activity.startDate as any,
+      endDate: activity.endDate as any
+    };
   }
+
+  cancelEdit() {
+    this.editingId = null;
+    this.activityUpdate = {} as updateActivity;
+  }
+
+  updateActivity(id: number) {
+    this.service.updateActivity(this.activityUpdate, id).subscribe({
+      next: (response) => {
+        const index = this.activities.findIndex(a => a.id === id);
+        if (index !== -1) this.activities[index] = response;
+        this.cancelEdit();
+        Swal.fire({ title: 'OK', text: 'Actividad actualizada', icon: 'success' });
+      },
+      error: (err) => Swal.fire({ title: 'Error', text: err.error, icon: 'error' })
+    });
+  }
+
+  confirmDelete(id: number) {
+    Swal.fire({
+      title: '¿Eliminar actividad?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.deleteActivity(id);
+      }
+    });
+  }
+
+  deleteActivity(id: number) {
+    this.service.deleteActivity(id).subscribe({
+      next: () => {
+        this.activities = this.activities.filter(a => a.id !== id);
+        Swal.fire({ title: 'OK', text: 'Actividad eliminada', icon: 'success' });
+      },
+      error: (err) => Swal.fire({ title: 'Error', text: err.error, icon: 'error' })
+    });
+  }
+
+
+}

@@ -56,4 +56,14 @@ export class UserService {
   getOrganizationByUserId(id:number):Observable<Organization>{
     return this.http.get<Organization>(`${this.organizationUrl}/${id}`)
   }
+
+  recoveryPassword(email:string){
+    const data = {email}
+    return this.http.post(`${this.baseUrl}/password/recovery`,data)
+  }
+
+  confirCode(email:string,code:string,newPassword:string){
+    const data = {email,code,newPassword}
+    return this.http.post(`${this.baseUrl}/password/confirm`,data)
+  }
 }

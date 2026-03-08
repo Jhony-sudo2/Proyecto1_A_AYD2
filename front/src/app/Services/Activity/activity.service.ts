@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environemnt } from '../../../environment/Environment';
-import { Activity, CreateActivity, CreateProposal, Proposal } from '../../interfaces/Activity';
+import { Activity, CreateActivity, CreateProposal, Proposal, updateActivity } from '../../interfaces/Activity';
 import { Observable } from 'rxjs';
 import { ProposalState } from '../../interfaces/Enums';
 
@@ -14,6 +14,14 @@ export class ActivityService {
 
   createActivity(data: CreateActivity): Observable<Activity> {
     return this.http.post<Activity>(this.baseUrl, data);
+  }
+
+  updateActivity(data:updateActivity,id:number):Observable<Activity>{    
+    return this.http.put<Activity>(`${this.baseUrl}/${id}`,data)
+  }
+
+  deleteActivity(id:number){
+    return this.http.delete(`${this.baseUrl}/${id}`)
   }
 
   getActivitiesByCongressId(congressId: number): Observable<Activity[]> {
@@ -34,11 +42,11 @@ export class ActivityService {
 
 
   getProposalsByCongressId(congressId: number): Observable<Proposal[]> {
-    return this.http.get<Proposal[]>(`${this.baseUrl}/congress/${congressId}`);
+    return this.http.get<Proposal[]>(`${this.baseUrl}/proposal/congress/${congressId}`);
   }
 
   getProposalByCongressIdAndState(congressId: number,state:ProposalState): Observable<Proposal[]> {
-    return this.http.get<Proposal[]>(`${this.baseUrl}/congress/${congressId}/${state}`);
+    return this.http.get<Proposal[]>(`${this.baseUrl}/proposal/congress/${congressId}/${state}`);
   }
 
   updateProposal(id: number, data: ProposalState): Observable<Proposal> {

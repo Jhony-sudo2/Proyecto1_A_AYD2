@@ -11,6 +11,11 @@ import { CreateProposalComponent } from './Activities/create-proposal/create-pro
 import { CreateActivityComponent } from './Activities/create-activity/create-activity.component';
 import { UserManagerComponent } from './User/user-manager/user-manager.component';
 import { InscriptionComponent } from './Congress/inscription/inscription.component';
+import { ProposalManagerComponent } from './Activities/proposal-manager/proposal-manager.component';
+import { AttendanceComponent } from './Activities/attendance/attendance.component';
+import { SystemConfigComponent } from './system-config/system-config.component';
+import { ScientificCommitteeComponent } from './Congress/scientific-committee/scientific-committee.component';
+import { ForgotPasswordComponent } from './User/forgot-password/forgot-password.component';
 
 export const routes: Routes = [
     {path:'auth/login',component:LoginComponent,title:'Login'},
@@ -24,7 +29,11 @@ export const routes: Routes = [
     {path:'activity/proposalCreate/:id',component:CreateProposalComponent,title:'Proponer trabajo'},
     {path:'activity/create/:id',component:CreateActivityComponent,title:'CrearActividad'},
     {path:'userManager',component:UserManagerComponent,title:'Administrar usuarios'},
-    {path:'inscription/:id',component:InscriptionComponent,title:'Inscripcion'}
-
+    {path:'inscription/:id',component:InscriptionComponent,title:'Inscripcion'},
+    {path:'proposalManager/:id',component:ProposalManagerComponent,title:'Adminsitracion de propuestas'},
+    {path:'atteendance/:id',component:AttendanceComponent,title:'Manejo de asistencias'},
+    {path:'sysconfiguration',component:SystemConfigComponent,title:'Configuracion del sistema'},
+    {path:'scientificCommittee/:id',component:ScientificCommitteeComponent,title:'Administrado comite cientifo'},
+    {path:'forgot-password',component:ForgotPasswordComponent,title:'Recuperar contrasenia'}
 
 ];

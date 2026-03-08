@@ -5,6 +5,7 @@ export interface Activity {
   id: number,
   name: string,
   description: string,
+  roomId:number
   startDate: string,
   endDate: string,
   type: string,
@@ -12,11 +13,20 @@ export interface Activity {
 }
 
 export interface CreateActivity {
+  name:string
   roomId: number,
   proposalId: number,
   startDate: Date,
   endDate: Date,
   capacity: number
+}
+
+export interface updateActivity{
+  startDate: Date,
+  endDate: Date,
+  capacity: number
+  roomId:number,
+  name:string
 }
 
 export interface Proposal {

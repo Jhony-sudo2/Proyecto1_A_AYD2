@@ -1,0 +1,215 @@
+<div class="min-h-screen bg-slate-950 px-4 py-12"
+    style="background-image: radial-gradient(ellipse at 20% 50%, rgba(56, 189, 248, 0.07) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Header congreso -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-6 flex items-center gap-4">
+            <div
+                class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 border border-sky-500/20 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-sky-400" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-slate-500 text-xs uppercase tracking-widest mb-0.5">Control de asistencia</p>
+                <h2 class="text-white font-bold truncate">{{ congress.name }}</h2>
+                <p class="text-slate-500 text-xs">{{ congress.locationName }}</p>
+            </div>
+            <div class="shrink-0 text-right">
+                <p class="text-slate-500 text-xs mb-0.5">Actividades</p>
+                <p class="text-2xl font-bold text-white">{{ activities.length }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <div class="lg:col-span-1 space-y-4">
+
+                <!-- Formulario registro SIEMPRE ARRIBA -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl shadow-black/30"
+                    [ngClass]="!selectedActivity ? 'opacity-50 pointer-events-none' : ''">
+
+                    <h3 class="text-white font-bold mb-1 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                        </svg>
+                        Registrar asistencia
+                    </h3>
+                    <p class="text-slate-600 text-xs mb-4">
+                        {{ selectedActivity ? selectedActivity.name : 'Selecciona una actividad abajo' }}
+                    </p>
+
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">No.
+                            Identificación</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
+                                </svg>
+                            </span>
+                            <input type="text" [(ngModel)]="newAteendance.userIdentification" name="identification"
+                                placeholder="Ej. 1234567890101"
+                                class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Fecha y
+                            hora</label>
+                        <input type="datetime-local" [(ngModel)]="newAteendance.date" name="date"
+                            class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+                    </div>
+
+                    <button (click)="saveAtteendance()"
+                        class="w-full py-3 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 shadow-lg shadow-sky-500/20 active:scale-95 transition-all duration-200">
+                        Registrar asistencia
+                    </button>
+                </div>
+
+                <!-- Lista de actividades CON SCROLL -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl shadow-black/30">
+                    <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                        </svg>
+                        Actividades
+                        <span class="text-xs font-normal text-slate-500 ml-1">({{ activities.length }})</span>
+                    </h3>
+
+                    <!-- MAX HEIGHT + SCROLL -->
+                    <div class="space-y-2 overflow-y-auto max-h-72 pr-1"
+                        style="scrollbar-width: thin; scrollbar-color: #334155 transparent;">
+                        <button *ngFor="let activity of activities" (click)="selectActivity(activity)"
+                            class="w-full text-left p-3 rounded-xl border transition-all duration-200" [ngClass]="selectedActivity?.id === activity.id
+          ? 'border-sky-500/50 bg-sky-500/10'
+          : 'border-slate-800 hover:border-slate-700 bg-slate-800/40'">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="min-w-0">
+                                    <p class="text-white text-sm font-semibold truncate">{{ activity.name }}</p>
+                                    <p class="text-slate-500 text-xs mt-0.5">{{ activity.startDate | date:'dd MMM,
+                                        HH:mm' }}</p>
+                                </div>
+                                <span class="shrink-0 text-xs px-2 py-0.5 rounded-full" [ngClass]="activity.type === 'CONFERENCE'
+                  ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                  : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'">
+                                    {{ activity.type === 'CONFERENCE' ? 'Conf.' : 'WS' }}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-1 mt-1.5 text-slate-600 text-xs">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                                </svg>
+                                {{ activity.type === 'CONFERENCE' ? 'Sin límite' : 'Cap. ' + activity.capacity }}
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <!-- Panel derecho: lista de asistentes -->
+            <div class="lg:col-span-2">
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl shadow-black/30">
+
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-white font-bold text-lg">
+                                {{ selectedActivity ? selectedActivity.name : 'Selecciona una actividad' }}
+                            </h3>
+                            <p class="text-slate-500 text-xs mt-0.5">{{ atteendancesList.length }} asistentes
+                                registrados</p>
+                        </div>
+                        <div *ngIf="selectedActivity" class="flex items-center gap-2">
+                            <span class="text-xs px-3 py-1 rounded-full font-semibold" [ngClass]="selectedActivity.type === 'CONFERENCE'
+                      ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                      : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'">
+                                {{ selectedActivity.type === 'CONFERENCE' ? 'Conferencia' : 'Workshop' }}
+                            </span>
+                            <!-- Barra de capacidad -->
+                            <div class="flex items-center gap-2">
+                                <ng-container *ngIf="!isUnlimited">
+                                    <div class="w-24 h-2 bg-slate-800 rounded-full overflow-hidden">
+                                        <div class="h-full rounded-full transition-all duration-500"
+                                            [ngClass]="capacityPercent > 80 ? 'bg-red-400' : capacityPercent > 50 ? 'bg-amber-400' : 'bg-emerald-400'"
+                                            [style.width.%]="capacityPercent"></div>
+                                    </div>
+                                    <span class="text-xs text-slate-500">{{ atteendancesList.length }}/{{
+                                        selectedActivity.capacity }}</span>
+                                </ng-container>
+
+                                <ng-container *ngIf="isUnlimited">
+                                    <span
+                                        class="text-xs px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 font-semibold flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M 3 12 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0 M 15 12 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0 M 9 12 h 6" />
+                                        </svg>
+                                        Sin límite · {{ atteendancesList.length }} asistentes
+                                    </span>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty -->
+                    <div *ngIf="!selectedActivity" class="text-center py-20 text-slate-600">
+                        <svg class="w-14 h-14 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor"
+                            stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
+                        </svg>
+                        <p>Selecciona una actividad para ver sus asistentes</p>
+                    </div>
+
+                    <div *ngIf="selectedActivity && atteendancesList.length === 0"
+                        class="text-center py-16 text-slate-600">
+                        <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor"
+                            stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                        </svg>
+                        <p>Sin asistentes registrados aún</p>
+                    </div>
+
+                    <!-- Lista asistentes -->
+                    <div *ngIf="atteendancesList.length > 0" class="space-y-2">
+                        <div *ngFor="let att of atteendancesList; let i = index"
+                            class="flex items-center gap-4 bg-slate-800/50 rounded-xl px-4 py-3 border border-slate-800">
+                            <span class="text-slate-600 text-xs font-mono w-6 text-center shrink-0">{{ i + 1 }}</span>
+                            <div
+                                class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 border border-sky-500/20 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-semibold truncate">{{ att.userName }}</p>
+                                <p class="text-slate-500 text-xs">ID: {{ att.userId }}</p>
+                            </div>
+                            <span
+                                class="shrink-0 text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
+                                Asistió
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

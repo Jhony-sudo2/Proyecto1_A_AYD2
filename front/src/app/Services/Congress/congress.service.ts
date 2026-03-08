@@ -5,6 +5,7 @@ import { CongressResponse, CreateCongress } from '../../interfaces/Congress';
 import { Observable } from 'rxjs';
 import { Location } from '../../interfaces/Location';
 import { Activity } from '../../interfaces/Activity';
+import { User } from '../../interfaces/User';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,19 @@ export class CongressService {
 
   getAllCongress():Observable<CongressResponse[]>{
     return this.http.get<CongressResponse[]>(this.baseUrl)
+  }
+
+  saveCommite(congressId:number,userId:number){
+    const data = {userId}
+    return this.http.post(`${this.baseUrl}/${congressId}/committee`,data)
+  }
+
+  getCommite(congressId:number):Observable<User[]>{
+    return this.http.get<User[]>(`${this.baseUrl}/${congressId}/committee`)
+  }
+
+  deleteCommite(congressId:number,userId:number){
+    return this.http.delete(`${this.baseUrl}/${congressId}/committee/${userId}`)
   }
 
 }

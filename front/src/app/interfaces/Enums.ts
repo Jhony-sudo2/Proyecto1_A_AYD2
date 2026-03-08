@@ -13,3 +13,4 @@ export enum ProposalState {
   PENDING = 'PENDING',
   REJECTED = 'REJECTED',
 }
+

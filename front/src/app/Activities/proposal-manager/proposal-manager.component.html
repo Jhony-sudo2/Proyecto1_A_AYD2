@@ -1,0 +1,122 @@
+<div class="min-h-screen bg-slate-950 px-4 py-12"
+     style="background-image: radial-gradient(ellipse at 20% 50%, rgba(56, 189, 248, 0.07) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);">
+
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-white">Gestor de propuestas</h1>
+        <p class="text-slate-500 text-sm mt-1">{{ proprosals.length }} propuestas recibidas</p>
+      </div>
+      <!-- Filtros -->
+      <div class="flex gap-2">
+        <button *ngFor="let f of filters" (click)="activeFilter = f.value"
+          class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 border"
+          [ngClass]="activeFilter === f.value ? f.activeClass : 'text-slate-500 border-slate-800 hover:border-slate-600 hover:text-slate-300'">
+          {{ f.label }}
+          <span class="ml-1 px-1.5 py-0.5 rounded-full text-xs bg-slate-800/80">{{ countByState(f.value) }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="filteredProposals.length === 0" class="text-center py-24 text-slate-600">
+      <svg class="w-14 h-14 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+      </svg>
+      <p>No hay propuestas en este estado</p>
+    </div>
+
+    <!-- Lista -->
+    <div class="space-y-4">
+      <div *ngFor="let proposal of filteredProposals"
+           class="bg-slate-900 border rounded-2xl p-5 transition-all duration-200"
+           [ngClass]="{
+             'border-slate-800 hover:border-slate-700': proposal.state === ProposalState.PENDING,
+             'border-emerald-500/30 bg-emerald-500/5': proposal.state === ProposalState.APPROVED,
+             'border-red-500/30 bg-red-500/5': proposal.state === ProposalState.REJECTED
+           }">
+
+        <div class="flex items-start justify-between gap-4">
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-2 flex-wrap">
+              <h3 class="text-white font-bold">{{ proposal.name }}</h3>
+
+              <!-- Badge tipo -->
+              <span class="text-xs px-2 py-0.5 rounded-full font-semibold"
+                    [ngClass]="proposal.type === 'CONFERENCE'
+                      ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                      : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'">
+                {{ proposal.type === 'CONFERENCE' ? 'Conferencia' : 'Workshop' }}
+              </span>
+
+              <!-- Badge estado -->
+              <span class="text-xs px-2 py-0.5 rounded-full font-semibold border"
+                    [ngClass]="{
+                      'bg-amber-500/10 text-amber-400 border-amber-500/20': proposal.state === ProposalState.PENDING,
+                      'bg-emerald-500/10 text-emerald-400 border-emerald-500/20': proposal.state === ProposalState.APPROVED,
+                      'bg-red-500/10 text-red-400 border-red-500/20': proposal.state === ProposalState.REJECTED
+                    }">
+                {{ stateLabel(proposal.state) }}
+              </span>
+            </div>
+
+            <p class="text-slate-400 text-sm leading-relaxed mb-3">{{ proposal.description }}</p>
+
+            <div class="flex items-center gap-4 text-xs text-slate-500">
+              <span class="flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
+                </svg>
+                {{ proposal.userName }}
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25" />
+                </svg>
+                {{ proposal.congressName }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="flex flex-col gap-2 shrink-0">
+
+            <!-- Si está pendiente: mostrar aprobar y rechazar -->
+            <ng-container *ngIf="proposal.state === ProposalState.PENDING">
+              <button (click)="changeState(proposal.id, ProposalState.APPROVED)"
+                class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 active:scale-95 transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Aprobar
+              </button>
+              <button (click)="changeState(proposal.id, ProposalState.REJECTED)"
+                class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-red-400 border border-red-500/30 hover:bg-red-500/10 active:scale-95 transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Rechazar
+              </button>
+            </ng-container>
+
+            <!-- Si ya tiene estado final: opción de regresar a pendiente -->
+            <ng-container *ngIf="proposal.state !== ProposalState.PENDING">
+              <button (click)="changeState(proposal.id, ProposalState.PENDING)"
+                class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 border border-slate-700 hover:border-slate-500 hover:text-slate-300 active:scale-95 transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                </svg>
+                Revertir
+              </button>
+            </ng-container>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
