@@ -9,9 +9,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "scientific_committee" )
+@Data
+@NoArgsConstructor
 public class ScientificCommitteeEntity {
     @EmbeddedId
     private CommiteeId id;

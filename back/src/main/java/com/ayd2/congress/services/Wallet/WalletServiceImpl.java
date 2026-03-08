@@ -22,7 +22,7 @@ import com.ayd2.congress.repositories.UserRepository;
 import com.ayd2.congress.repositories.Wallet.RechargeWalletRepository;
 import com.ayd2.congress.repositories.Wallet.WalletRepository;
 import com.ayd2.congress.repositories.Wallet.WalletTransactionRepository;
-import com.ayd2.congress.services.SystemConfig.SystemConfigService;
+import com.ayd2.congress.services.systemconfig.SystemConfigService;
 
 import jakarta.transaction.Transactional;
 

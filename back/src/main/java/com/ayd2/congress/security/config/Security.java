@@ -48,6 +48,7 @@ public class Security {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.POST, "/auth", "/auth").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/users/password/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/organizations").permitAll()
                         .requestMatchers(HttpMethod.GET, "/congresses").permitAll()
                         .requestMatchers(

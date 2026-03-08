@@ -18,25 +18,25 @@ import com.ayd2.congress.services.systemconfig.SystemConfigService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/admin")
-public class AdminController {
+@RequestMapping("/systemconfigurations")
+public class SystemController {
     private final SystemConfigService service;
     @Autowired
-    public AdminController(SystemConfigService service){
+    public SystemController(SystemConfigService service) {
         this.service = service;
     }
 
-    @GetMapping("/config")
-    public ResponseEntity<SysConfigResponse> getConfig() throws NotFoundException{
+    @GetMapping()
+    public ResponseEntity<SysConfigResponse> getSystemConfig() throws NotFoundException{
         SysConfigResponse response = service.getConfigResponse();
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/config")
-    public ResponseEntity<SysConfigResponse> updateSysConfig(@Valid @RequestBody SysConfigUpdate request) throws NotFoundException, InvalidPriceException{
-        SysConfigResponse response = service.update(request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    @PutMapping()
+    public ResponseEntity<SysConfigResponse> updateConfig(@Valid @RequestBody SysConfigUpdate update) throws NotFoundException, InvalidPriceException{
+        SysConfigResponse response = service.update(update);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    
 
+    
 }

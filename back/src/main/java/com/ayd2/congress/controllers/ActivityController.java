@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import com.ayd2.congress.dtos.acitivty.ActivityResponse;
 import com.ayd2.congress.dtos.acitivty.NewActivityRequest;
 import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
+import com.ayd2.congress.dtos.acitivty.UpdateActivity;
 import com.ayd2.congress.dtos.acitivty.UpdateProposal;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.InvalidDateRangeException;
@@ -40,6 +42,18 @@ public class ActivityController {
     public ResponseEntity<ActivityResponse> createActivity(@Valid @RequestBody NewActivityRequest request) throws NotFoundException, DuplicatedEntityException, InvalidDateRangeException{
         ActivityResponse response = activityService.createActivity(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ActivityResponse> updateActivity(@Valid @RequestBody UpdateActivity request,@PathVariable Long id) throws NotFoundException, DuplicatedEntityException, InvalidDateRangeException{
+        ActivityResponse response = activityService.updateActivity(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteActivity(@PathVariable Long id) throws NotFoundException, DuplicatedEntityException, InvalidDateRangeException{
+        activityService.deleteAcivity(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/proposal")

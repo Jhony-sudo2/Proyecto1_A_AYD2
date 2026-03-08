@@ -7,56 +7,73 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ayd2.congress.compositePrimaryKeys.CommiteeId;
 import com.ayd2.congress.dtos.Congress.CongressResponse;
+import com.ayd2.congress.dtos.Congress.NewCommitteeRequest;
 import com.ayd2.congress.dtos.Congress.NewCongressRequest;
 import com.ayd2.congress.dtos.Congress.UpdateCongress;
+import com.ayd2.congress.dtos.User.UserResponse;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.InvalidDateRangeException;
 import com.ayd2.congress.exceptions.InvalidPriceException;
 import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.mappers.CongressMapper;
+import com.ayd2.congress.mappers.UserMapper;
 import com.ayd2.congress.models.Congress.CongressEntity;
 import com.ayd2.congress.models.Congress.LocationEntity;
+import com.ayd2.congress.models.Congress.ScientificCommitteeEntity;
 import com.ayd2.congress.models.Organization.OrganizationEntity;
+import com.ayd2.congress.models.User.UserEntity;
 import com.ayd2.congress.repositories.CongressRepository;
+import com.ayd2.congress.repositories.Congress.CommiteeRepository;
 import com.ayd2.congress.services.Location.LocationService;
 import com.ayd2.congress.services.Organization.OrganizationService;
-import com.ayd2.congress.services.SystemConfig.SystemConfigService;
+import com.ayd2.congress.services.User.UserService;
 import com.ayd2.congress.services.aws.S3Service;
+import com.ayd2.congress.services.systemconfig.SystemConfigService;
 
 @Service
-public class CongressServiceImpl implements CongressService{
+public class CongressServiceImpl implements CongressService {
     private final CongressRepository congressRepository;
     private final CongressMapper congressMapper;
     private final OrganizationService organizationService;
     private final LocationService locationService;
     private final SystemConfigService systemConfigService;
+    private final CommiteeRepository commiteeRepository;
+    private final UserService userService;
     private final S3Service s3Service;
+    private final UserMapper userMapper;
 
     @Autowired
     public CongressServiceImpl(CongressRepository congressRepository, CongressMapper congressMapper,
-            OrganizationService organizationService, LocationService locationService,SystemConfigService systemConfigService, S3Service s3Service) {
+            OrganizationService organizationService, LocationService locationService,
+            SystemConfigService systemConfigService, S3Service s3Service, CommiteeRepository commiteeRepository,
+            UserService userService, UserMapper userMapper) {
         this.congressRepository = congressRepository;
         this.congressMapper = congressMapper;
         this.organizationService = organizationService;
         this.locationService = locationService;
         this.systemConfigService = systemConfigService;
         this.s3Service = s3Service;
+        this.commiteeRepository = commiteeRepository;
+        this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @Override
-    public CongressResponse create(NewCongressRequest request) throws NotFoundException, InvalidDateRangeException, InvalidPriceException, IOException, DuplicatedEntityException {
+    public CongressResponse create(NewCongressRequest request) throws NotFoundException, InvalidDateRangeException,
+            InvalidPriceException, IOException, DuplicatedEntityException {
         OrganizationEntity organization = organizationService.getById(request.getOrganizationId());
         LocationEntity location = locationService.getLocationById(request.getLocationId());
 
         LocalDateTime startDate = request.getStartDate();
-        LocalDateTime endDate  = request.getEndDate();
+        LocalDateTime endDate = request.getEndDate();
         LocalDateTime endCallDate = request.getEndCallDate();
         Double minPirceCongress = systemConfigService.getConfiguration().getPrice();
         if (startDate.isAfter(endDate)) {
             throw new InvalidDateRangeException("START DATE MUST BE BEFORE END DATE");
         }
-        if(!endCallDate.isBefore(startDate)){
+        if (!endCallDate.isBefore(startDate)) {
             throw new InvalidDateRangeException("DATE INVALID TO CALL TO APPLICATION");
         }
         if (request.getPrice() < minPirceCongress) {
@@ -67,7 +84,7 @@ public class CongressServiceImpl implements CongressService{
             throw new DuplicatedEntityException("El lugar seleccionado ya está ocupado en las fechas indicadas.");
         }
 
-        String imagen = s3Service.uploadBase64(request.getImageUrl(), "congress_"+request.getName());
+        String imagen = s3Service.uploadBase64(request.getImageUrl(), "congress_" + request.getName());
         CongressEntity newCongress = congressMapper.toEntity(request);
         newCongress.setLocation(location);
         newCongress.setOrganization(organization);
@@ -76,18 +93,18 @@ public class CongressServiceImpl implements CongressService{
         return congressMapper.toResponse(newCongress);
     }
 
-    
     @Override
-    public CongressResponse update(UpdateCongress updateCongress,Long id) throws NotFoundException, InvalidDateRangeException {
+    public CongressResponse update(UpdateCongress updateCongress, Long id)
+            throws NotFoundException, InvalidDateRangeException {
         LocationEntity location = locationService.getLocationById(updateCongress.getLocationId());
 
         CongressEntity congressToUpdate = getById(id);
         LocalDateTime startCongressDate = congressToUpdate.getStartDate();
-        
+
         if (updateCongress.getEndCallDate().isAfter(startCongressDate)) {
             throw new InvalidDateRangeException("DATE INVALID TO CALL TO APPLICATION");
-        }  
-        
+        }
+
         congressToUpdate.setName(updateCongress.getName());
         congressToUpdate.setDescription(updateCongress.getDescription());
         congressToUpdate.setLocation(location);
@@ -98,7 +115,7 @@ public class CongressServiceImpl implements CongressService{
     @Override
     public CongressEntity getById(Long id) throws NotFoundException {
         return congressRepository.findById(id)
-            .orElseThrow(()-> new NotFoundException("Congress not found"));
+                .orElseThrow(() -> new NotFoundException("Congress not found"));
     }
 
     @Override
@@ -119,5 +136,46 @@ public class CongressServiceImpl implements CongressService{
         List<CongressEntity> response = congressRepository.findAll();
         return congressMapper.toCongressResponseList(response);
     }
-    
+
+    @Override
+    public void createScientificCommittee(Long congressId,NewCommitteeRequest request)
+            throws NotFoundException, DuplicatedEntityException {
+        UserEntity user = userService.getById(request.getUserId());
+        CongressEntity congress = getById(congressId);
+        boolean exits = commiteeRepository.existsByUserIdAndCongressId(user.getId(), congress.getId());
+        if (exits) {
+            throw new DuplicatedEntityException("El usuario ya es parte del comite de este congreso");
+        }
+        CommiteeId id = new CommiteeId(congress.getId(), user.getId());
+        ScientificCommitteeEntity newEntity = new ScientificCommitteeEntity();
+        newEntity.setCongress(congress);
+        newEntity.setUser(user);
+        newEntity.setId(id);
+        userService.updateRol(2L,user.getId());
+        commiteeRepository.save(newEntity);
+    }
+
+    @Override
+    public List<UserResponse> getCommitteByCongressId(Long id) throws NotFoundException {
+        getById(id);
+
+        List<ScientificCommitteeEntity> list = commiteeRepository.findAllByCongressId(id);
+        List<UserEntity> users = list.stream()
+                .map(ScientificCommitteeEntity::getUser)
+                .toList();
+        return userMapper.toResponseList(users);
+    }
+
+    @Override
+    public void removeCommitteeMember(Long congressId, Long userId) throws NotFoundException {
+        getById(userId);
+        userService.getById(userId);
+        boolean exists = commiteeRepository.existsByUserIdAndCongressId(userId, congressId);
+        if(!exists){
+            throw new NotFoundException("Registro no encontrado");
+        }
+        ScientificCommitteeEntity entity = commiteeRepository.findByUserIdAndCongressId(userId, congressId).get();
+        commiteeRepository.delete(entity);
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.ayd2.congress.services.SystemConfig;
+package com.ayd2.congress.services.systemconfig;
 
 import com.ayd2.congress.dtos.SysConfig.SysConfigResponse;
 import com.ayd2.congress.dtos.SysConfig.SysConfigUpdate;

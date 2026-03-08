@@ -12,14 +12,33 @@ import com.ayd2.congress.models.Activities.ActivityEntity;
 @Repository
 public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> {
     @Query("""
-        select (count(a) > 0)
-        from ActivityEntity a
-        where a.room.id = :roomId
-          and a.startDate < :endDate
-          and a.endDate > :startDate
-    """)
+                select (count(a) > 0)
+                from ActivityEntity a
+                where a.room.id = :roomId
+                  and a.startDate < :endDate
+                  and a.endDate > :startDate
+            """)
     boolean existsOverlap(Long roomId, LocalDateTime startDate, LocalDateTime endDate);
+
+    @Query("""
+                select (count(a) > 0)
+                from ActivityEntity a
+                where a.room.id = :roomId
+                  and a.startDate < :endDate
+                  and a.endDate > :startDate
+                  and a.id <> :activityId
+            """)
+    boolean existsOverlapExcludingId(Long roomId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Long activityId);
+
     boolean existsByProposalId(Long proposalId);
+
+    boolean existsByRoomId(Long roomId);
+
     List<ActivityEntity> findByProposalCongressId(Long congressId);
-    List<ActivityEntity> findByTypeAndProposalCongressId(com.ayd2.congress.models.Enums.ActivityType type, Long congressId);
+
+    List<ActivityEntity> findByProposalTypeAndProposalCongressId(com.ayd2.congress.models.Enums.ActivityType type,
+            Long congressId);
 }

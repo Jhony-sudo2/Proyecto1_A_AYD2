@@ -1,4 +1,4 @@
-package com.ayd2.congress.services.SystemConfig;
+package com.ayd2.congress.services.systemconfig;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

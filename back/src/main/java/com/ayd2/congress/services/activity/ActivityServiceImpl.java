@@ -10,6 +10,7 @@ import com.ayd2.congress.dtos.acitivty.ActivityResponse;
 import com.ayd2.congress.dtos.acitivty.NewActivityRequest;
 import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
+import com.ayd2.congress.dtos.acitivty.UpdateActivity;
 import com.ayd2.congress.dtos.acitivty.UpdateProposal;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.InvalidDateRangeException;
@@ -81,6 +82,8 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setRoom(room);
         activity.setStartDate(startDate);
         activity.setEndDate(endDate);
+        activity.setName(request.getName());
+        activity.setCapacity(request.getCapacity());
         activityRepository.save(activity);
         return activityMapper.toActivityResponse(activity);
     }
@@ -94,7 +97,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<ActivityResponse> getActivitiesByTypeAndCongressId(ActivityType type, Long congressId)
             throws NotFoundException {
-        List<ActivityEntity> activities = activityRepository.findByTypeAndProposalCongressId(type, congressId);
+        List<ActivityEntity> activities = activityRepository.findByProposalTypeAndProposalCongressId(type, congressId);
         return activityMapper.toActivityResponseList(activities);
     }
 
@@ -166,6 +169,40 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ProposalResponse getProposalResponseById(Long id) throws NotFoundException {
         return activityMapper.toProposalResponse(getProposalById(id));
+    }
+
+    @Override
+    public void deleteAcivity(Long activityId) throws NotFoundException {
+        ActivityEntity entity = getActivityById(activityId);
+        activityRepository.delete(entity);
+    }
+
+    @Override
+    public ActivityResponse updateActivity(Long id, UpdateActivity request) throws NotFoundException,DuplicatedEntityException, InvalidDateRangeException{
+        ActivityEntity activityToUpdate = getActivityById(id);
+        ConferenceRoomEntity room = locationService.getRoomById(request.getRoomId());
+        LocalDateTime endDate = request.getEndDate();
+        LocalDateTime startDate = request.getStartDate();
+
+        if (endDate.isBefore(startDate)) {
+            throw new InvalidDateRangeException("End date must be after start date");
+        }
+        CongressEntity congress = activityToUpdate.getProposal().getCongress();
+        if (startDate.isBefore(congress.getStartDate()) || endDate.isAfter(congress.getEndDate())) {
+            throw new IllegalArgumentException("Activity must be scheduled within the congress dates");
+        }
+
+        boolean existsOverLap = activityRepository.existsOverlapExcludingId(request.getRoomId(), request.getStartDate(), request.getEndDate(), id);
+        if(existsOverLap){
+            throw new DuplicatedEntityException("The room is already booked for the given time range");
+        }
+        activityToUpdate.setCapacity(request.getCapacity());
+        activityToUpdate.setRoom(room);
+        activityToUpdate.setStartDate(request.getStartDate());
+        activityToUpdate.setEndDate(request.getEndDate());
+        activityToUpdate.setName(request.getName());
+        activityRepository.save(activityToUpdate);
+        return activityMapper.toActivityResponse(activityToUpdate);
     }
 
 }

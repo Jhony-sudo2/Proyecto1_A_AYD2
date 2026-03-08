@@ -11,9 +11,11 @@ import com.ayd2.congress.dtos.Location.RoomResponse;
 import com.ayd2.congress.dtos.Location.UpdateRoom;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.exceptions.RoomHasActivitiesException;
 import com.ayd2.congress.mappers.LocationMapper;
 import com.ayd2.congress.models.Congress.ConferenceRoomEntity;
 import com.ayd2.congress.models.Congress.LocationEntity;
+import com.ayd2.congress.repositories.Activity.ActivityRepository;
 import com.ayd2.congress.repositories.Congress.LocationRepository;
 import com.ayd2.congress.repositories.Congress.RoomRepository;
 
@@ -22,12 +24,14 @@ public class LocationServiceImpl implements LocationService{
     private final LocationRepository locationRepository;
     private final RoomRepository roomRepository;
     private final LocationMapper locationMapper;
+    private final ActivityRepository activityRepository;
 
     public LocationServiceImpl(LocationRepository locationRepository, RoomRepository roomRepository,
-            LocationMapper locationMapper) {
+            LocationMapper locationMapper,ActivityRepository activityRepository) {
         this.locationRepository = locationRepository;
         this.roomRepository = roomRepository;
         this.locationMapper = locationMapper;
+        this.activityRepository = activityRepository;
     }
 
     @Override
@@ -102,6 +106,17 @@ public class LocationServiceImpl implements LocationService{
     public List<LocationResponse> getAllLocations() {
         List<LocationEntity> locations = locationRepository.findAll();
         return locationMapper.toResponseList(locations);
+    }
+
+    @Override
+    public void deleteRoom(Long id) throws NotFoundException, RoomHasActivitiesException {
+        ConferenceRoomEntity room = getRoomById(id);
+        boolean exists = activityRepository.existsByRoomId(id);
+        if (exists) {
+            throw new RoomHasActivitiesException("EL SALON TIENE ACTIVIDADES ASOCIADAS");
+        }
+
+        roomRepository.delete(room);
     }
     
 }

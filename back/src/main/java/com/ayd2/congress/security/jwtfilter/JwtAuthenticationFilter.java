@@ -29,8 +29,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
+
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -39,29 +42,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        String email;
+
         try {
-            email = jwtService.getUsername(token);
+
+            String email = jwtService.getUsername(token);
+
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                if (!jwtService.isTokenExpired(email)) {
+
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
+
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+
+                    jwtService.updateTokenExpiration(email);
+                }
+            }
+
         } catch (Exception ex) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+            
         }
-        if (email == null || SecurityContextHolder.getContext().getAuthentication() != null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        if (jwtService.isTokenExpired(email)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null,
-                userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        jwtService.updateTokenExpiration(email);
-       
         filterChain.doFilter(request, response);
     }
 }

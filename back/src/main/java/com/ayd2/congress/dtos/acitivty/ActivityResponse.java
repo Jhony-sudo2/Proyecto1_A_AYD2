@@ -15,4 +15,5 @@ public class ActivityResponse {
     private LocalDateTime endDate;
     private ActivityType type;
     private Integer capacity;
+    private Long roomId;
 }

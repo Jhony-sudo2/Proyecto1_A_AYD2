@@ -16,10 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ayd2.congress.dtos.User.ConfirmCode;
 import com.ayd2.congress.dtos.User.NewUserRequest;
+import com.ayd2.congress.dtos.User.RecoverPassword;
 import com.ayd2.congress.dtos.User.UpdatePassword;
 import com.ayd2.congress.dtos.User.UserResponse;
 import com.ayd2.congress.dtos.User.UserUpdate;
+import com.ayd2.congress.exceptions.CodeAlreadyExpiredException;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotAuthorizedException;
 import com.ayd2.congress.exceptions.NotFoundException;
@@ -31,6 +34,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/users")
 public class UserController {
     private final UserService service;
+
     @Autowired
     public UserController(UserService service) {
         this.service = service;
@@ -44,7 +48,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers(){
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
         List<UserResponse> responses = service.getAllUsers();
         return ResponseEntity.ok(responses);
     }
@@ -72,6 +76,22 @@ public class UserController {
             throws NotFoundException, NotAuthorizedException {
         service.updatePassword(request, id);
         return ResponseEntity.ok();
+    }
+
+    @PostMapping("/password/recovery")
+    public ResponseEntity<Void> recoverPassword(@Valid @RequestBody RecoverPassword request)
+            throws NotFoundException {
+
+        service.recoverPassword(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/password/confirm")
+    public ResponseEntity<Void> confirmCode(@Valid @RequestBody ConfirmCode request)
+            throws NotFoundException, CodeAlreadyExpiredException {
+
+        service.confirmCode(request);
+        return ResponseEntity.ok().build();
     }
 
 }

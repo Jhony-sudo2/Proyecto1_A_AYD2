@@ -15,8 +15,9 @@ import com.ayd2.congress.models.Activities.ProposalEntity;
 public interface ActivityMapper {
 
 
-    @Mapping(target = "name", source = "proposal.name")
     @Mapping(target = "description", source = "proposal.description")
+    @Mapping(target = "type",source = "proposal.type")
+    @Mapping(target = "roomId",source = "room.id")
     ActivityResponse toActivityResponse(ActivityEntity entity);
     List<ActivityResponse> toActivityResponseList(List<ActivityEntity> entities);
 

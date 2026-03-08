@@ -49,4 +49,8 @@ public class UserEntity {
     private OrganizationEntity organization;
     @Column
     private LocalDateTime tokenExpiration;
+    @Column
+    private String recoveryCode;
+    @Column
+    private LocalDateTime codeExpiration;
 }

@@ -3,6 +3,7 @@ package com.ayd2.congress.services.attendance;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ayd2.congress.compositePrimaryKeys.AttendanceId;
 import com.ayd2.congress.dtos.attendance.AttendanceResponse;
@@ -25,6 +26,7 @@ import com.ayd2.congress.services.Inscription.InscriptionService;
 import com.ayd2.congress.services.User.UserService;
 import com.ayd2.congress.services.activity.ActivityService;
 
+@Service
 public class AttendanceServiceImpl implements AttendanceService{
     private final ActivityService activityService;
     private final AttendanceRepository attendanceRepository;
@@ -51,11 +53,11 @@ public class AttendanceServiceImpl implements AttendanceService{
         boolean isInscribed = inscriptionService.isUserEnrolledInCongress(user.getId(), congress.getId());
         if(!isInscribed) throw new NotFoundException("User is not inscribed in the congress");
 
-        if(acitivty.getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.ATTENDACE){
+        if(acitivty.getProposal().getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.ATTENDACE){
             boolean isEnrolled = isEnrolledInWorkshop(user.getId(), acitivty.getId());
             if(!isEnrolled) throw new NotFoundException("User is not enrolled in the workshop");
         }
-        else if (acitivty.getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.WORKSHOPINSCRIPTION) 
+        else if (acitivty.getProposal().getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.WORKSHOPINSCRIPTION) 
             verifyCapacity(acitivty.getId());
         
         
@@ -78,7 +80,7 @@ public class AttendanceServiceImpl implements AttendanceService{
     public boolean verifyCapacity(Long activityId)
             throws NotFoundException,ActivityFullException{
         ActivityEntity activity = activityService.getActivityById(activityId);
-        if (activity.getType() != ActivityType.WORKSHOP) {
+        if (activity.getProposal().getType() != ActivityType.WORKSHOP) {
             throw new NotFoundException("Activity is not a workshop");
         }
         if(activity.getCapacity() == 0) throw new ActivityFullException("Activity has no capacity");
@@ -103,7 +105,7 @@ public class AttendanceServiceImpl implements AttendanceService{
     @Override
     public boolean isEnrolledInWorkshop(Long userId, Long activityId) throws NotFoundException {
         ActivityEntity activity = activityService.getActivityById(activityId);
-        if(activity.getType() != ActivityType.WORKSHOP) throw new NotFoundException("Activity is not a workshop");
+        if(activity.getProposal().getType() != ActivityType.WORKSHOP) throw new NotFoundException("Activity is not a workshop");
         return attendanceRepository.existsByActivityIdAndUserIdAndType(activityId, userId, AttendanceType.WORKSHOPINSCRIPTION);
     }
     

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import com.ayd2.congress.dtos.Location.RoomResponse;
 import com.ayd2.congress.dtos.Location.UpdateRoom;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.exceptions.RoomHasActivitiesException;
 import com.ayd2.congress.services.Location.LocationService;
 
 @RestController
@@ -69,6 +71,12 @@ public class LocationController {
     public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long id,@Validated @RequestBody UpdateRoom request) throws NotFoundException, DuplicatedEntityException {
         RoomResponse response = locationService.updateRoom(id, request);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/rooms/{id}")
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) throws NotFoundException, RoomHasActivitiesException{
+        locationService.deleteRoom(id);
+        return ResponseEntity.ok().build();
     }
 
 }

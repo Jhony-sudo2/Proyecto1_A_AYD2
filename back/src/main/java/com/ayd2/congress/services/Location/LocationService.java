@@ -9,6 +9,7 @@ import com.ayd2.congress.dtos.Location.RoomResponse;
 import com.ayd2.congress.dtos.Location.UpdateRoom;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.exceptions.RoomHasActivitiesException;
 import com.ayd2.congress.models.Congress.ConferenceRoomEntity;
 import com.ayd2.congress.models.Congress.LocationEntity;
 
@@ -22,4 +23,5 @@ public interface LocationService {
     RoomResponse updateRoom(Long id,UpdateRoom request) throws NotFoundException, DuplicatedEntityException;
     List<RoomResponse> getRoomsByLocationId(Long locationId) throws NotFoundException;
     List<LocationResponse> getAllLocations();
+    void deleteRoom(Long id) throws NotFoundException,RoomHasActivitiesException;
 }
