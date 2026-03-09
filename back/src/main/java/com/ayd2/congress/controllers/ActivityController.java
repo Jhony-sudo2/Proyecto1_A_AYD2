@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ayd2.congress.dtos.acitivty.ActivityResponse;
+import com.ayd2.congress.dtos.acitivty.NewActivityGuest;
 import com.ayd2.congress.dtos.acitivty.NewActivityRequest;
 import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
@@ -41,6 +42,12 @@ public class ActivityController {
     @PostMapping
     public ResponseEntity<ActivityResponse> createActivity(@Valid @RequestBody NewActivityRequest request) throws NotFoundException, DuplicatedEntityException, InvalidDateRangeException{
         ActivityResponse response = activityService.createActivity(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/guest")
+    public ResponseEntity<ActivityResponse> createActivityWithGuest(@Valid @RequestBody NewActivityGuest request) throws NotFoundException, DuplicatedEntityException, InvalidDateRangeException{
+        ActivityResponse response = activityService.createActivityWithGuest(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

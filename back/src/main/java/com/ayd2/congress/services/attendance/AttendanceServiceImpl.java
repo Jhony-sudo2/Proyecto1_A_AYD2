@@ -46,18 +46,17 @@ public class AttendanceServiceImpl implements AttendanceService{
     public void createAttendance(NewAttendanceRequest request) throws NotFoundException, DuplicatedEntityException, ActivityFullException, ActivityAlreadyEndendException, ActivityNotStartedException, CongressNotStartedException {
         ActivityEntity acitivty = activityService.getActivityById(request.getActivityId());
         UserEntity user = userService.getByIdentification(request.getUserIdentification());
-        CongressEntity congress = acitivty.getProposal().getCongress();
-
+        CongressEntity congress = acitivty.getCongress();
         boolean exists = attendanceRepository.existsByActivityIdAndUserIdAndType(request.getActivityId(), user.getId(), request.getType());
         if(exists) throw new DuplicatedEntityException("Attendance already exists");
         boolean isInscribed = inscriptionService.isUserEnrolledInCongress(user.getId(), congress.getId());
         if(!isInscribed) throw new NotFoundException("User is not inscribed in the congress");
 
-        if(acitivty.getProposal().getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.ATTENDANCE){
+        if(acitivty.getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.ATTENDANCE){
             boolean isEnrolled = isEnrolledInWorkshop(user.getId(), acitivty.getId());
             if(!isEnrolled) throw new NotFoundException("User is not enrolled in the workshop");
         }
-        else if (acitivty.getProposal().getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.WORKSHOPINSCRIPTION) 
+        else if (acitivty.getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.WORKSHOPINSCRIPTION) 
             verifyCapacity(acitivty.getId());
         
         
@@ -80,7 +79,7 @@ public class AttendanceServiceImpl implements AttendanceService{
     public boolean verifyCapacity(Long activityId)
             throws NotFoundException,ActivityFullException{
         ActivityEntity activity = activityService.getActivityById(activityId);
-        if (activity.getProposal().getType() != ActivityType.WORKSHOP) {
+        if (activity.getType() != ActivityType.WORKSHOP) {
             throw new NotFoundException("Activity is not a workshop");
         }
         if(activity.getCapacity() == 0) throw new ActivityFullException("Activity has no capacity");
@@ -105,7 +104,7 @@ public class AttendanceServiceImpl implements AttendanceService{
     @Override
     public boolean isEnrolledInWorkshop(Long userId, Long activityId) throws NotFoundException {
         ActivityEntity activity = activityService.getActivityById(activityId);
-        if(activity.getProposal().getType() != ActivityType.WORKSHOP) throw new NotFoundException("Activity is not a workshop");
+        if(activity.getType() != ActivityType.WORKSHOP) throw new NotFoundException("Activity is not a workshop");
         return attendanceRepository.existsByActivityIdAndUserIdAndType(activityId, userId, AttendanceType.WORKSHOPINSCRIPTION);
     }
     

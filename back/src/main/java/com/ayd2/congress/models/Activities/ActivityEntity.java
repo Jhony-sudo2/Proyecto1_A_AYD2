@@ -3,12 +3,17 @@ package com.ayd2.congress.models.Activities;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 import com.ayd2.congress.models.Attendance.AttendanceEntity;
 import com.ayd2.congress.models.Congress.ConferenceRoomEntity;
+import com.ayd2.congress.models.Congress.CongressEntity;
+import com.ayd2.congress.models.Enums.ActivityType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,12 +42,18 @@ public class ActivityEntity {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private ConferenceRoomEntity room;
+    @Column(nullable = false)
+    private String description;
     @ManyToOne
-    @JoinColumn(name = "proposal_id")
-    private ProposalEntity proposal;
+    @JoinColumn(name = "congress_id")
+    private CongressEntity congress;
     @Column(nullable = true)
     private long capacity;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ActivityType type;
     @OneToMany(mappedBy = "activity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AttendanceEntity> attendances;
-
+    @OneToMany(mappedBy = "activity")
+    private List<SpeakerEntity> speakers;
 }

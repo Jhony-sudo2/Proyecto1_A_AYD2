@@ -28,8 +28,8 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, At
     @Query("""
                 SELECT a
                 FROM ActivityEntity a
-                WHERE a.proposal.congress.id = :congressId
-                AND a.proposal.type = com.ayd2.congress.models.Enums.ActivityType.WORKSHOP
+                WHERE a.congress.id = :congressId
+                AND a.type = com.ayd2.congress.models.Enums.ActivityType.WORKSHOP
                 AND (:activityId IS NULL OR a.id = :activityId)
             """)
     List<ActivityEntity> getWorkshops(
@@ -47,7 +47,7 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, At
                 FROM AttendanceEntity att
                 JOIN att.activity a
                 JOIN att.user u
-                JOIN InscriptionEntity i ON i.user = u AND i.congress = a.proposal.congress
+                JOIN InscriptionEntity i ON i.user = u AND i.congress = a.congress
                 JOIN i.attendeeRol ar
                 WHERE att.type = com.ayd2.congress.models.Enums.AttendanceType.WORKSHOPINSCRIPTION
                 AND a.id = :activityId

@@ -16,4 +16,6 @@ public class ActivityResponse {
     private ActivityType type;
     private Integer capacity;
     private Long roomId;
+    private String roomName;
+    private String[] speakers;
 }

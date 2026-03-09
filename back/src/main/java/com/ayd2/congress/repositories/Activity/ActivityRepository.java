@@ -33,12 +33,10 @@ public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> 
             LocalDateTime endDate,
             Long activityId);
 
-    boolean existsByProposalId(Long proposalId);
-
     boolean existsByRoomId(Long roomId);
 
-    List<ActivityEntity> findByProposalCongressId(Long congressId);
+    List<ActivityEntity> findByCongressId(Long congressId);
 
-    List<ActivityEntity> findByProposalTypeAndProposalCongressId(com.ayd2.congress.models.Enums.ActivityType type,
+    List<ActivityEntity> findByTypeAndCongressId(com.ayd2.congress.models.Enums.ActivityType type,
             Long congressId);
 }

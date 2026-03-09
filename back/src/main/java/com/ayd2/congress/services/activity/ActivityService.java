@@ -19,7 +19,7 @@ import com.ayd2.congress.models.Enums.ProposalState;
 
 public interface ActivityService {
     ActivityResponse createActivity(NewActivityRequest request) throws NotFoundException,DuplicatedEntityException,InvalidDateRangeException;
-    ActivityResponse createActivityWithGuest(NewActivityGuest request,NewProposalRequest proposalRequest) throws NotFoundException,DuplicatedEntityException,InvalidDateRangeException;
+    ActivityResponse createActivityWithGuest(NewActivityGuest request) throws NotFoundException,DuplicatedEntityException,InvalidDateRangeException;
     List<ActivityResponse> getActivitiesByCongressId(Long congressId) throws NotFoundException;
     List<ActivityResponse> getActivitiesByTypeAndCongressId(ActivityType type, Long congressId) throws NotFoundException;
     ProposalResponse createProposal(NewProposalRequest request) throws NotFoundException,DuplicatedEntityException;

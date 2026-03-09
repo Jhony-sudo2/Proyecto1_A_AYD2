@@ -17,7 +17,7 @@ public interface AttendanceMapper {
     List<AttendanceResponse> toResponseList(List<AttendanceEntity> entities);
 
     @Mapping(target = "activityId", source = "activity.id")
-    @Mapping(target = "activityName", source = "activity.proposal.name")
+    @Mapping(target = "activityName", source = "activity.name")
     AttendanceUserResponse toUserResponse(AttendanceEntity entity);
     List<AttendanceUserResponse> toUserResponseList(List<AttendanceEntity> entities);
 }

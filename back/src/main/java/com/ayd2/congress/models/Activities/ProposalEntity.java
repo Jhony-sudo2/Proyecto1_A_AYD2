@@ -42,5 +42,7 @@ public class ProposalEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ActivityType type;
+    @Column(nullable = false)
+    private boolean used;
 
 }
