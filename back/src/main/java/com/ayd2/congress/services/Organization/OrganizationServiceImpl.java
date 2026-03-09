@@ -1,5 +1,6 @@
 package com.ayd2.congress.services.Organization;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,25 +14,30 @@ import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.mappers.OrganizationMapper;
 import com.ayd2.congress.models.Organization.OrganizationEntity;
 import com.ayd2.congress.repositories.OrganizationRepository;
+import com.ayd2.congress.services.aws.S3Service;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService{
     private final OrganizationRepository repository;
     private final OrganizationMapper mapper;
+    private final S3Service s3Service;
 
     @Autowired
-    public OrganizationServiceImpl(OrganizationRepository repository,OrganizationMapper mapper) {
+    public OrganizationServiceImpl(OrganizationRepository repository,OrganizationMapper mapper,S3Service s3Service) {
         this.repository = repository;
         this.mapper = mapper;
+        this.s3Service = s3Service;
     }
 
 
     @Override
-    public OrganizationResponse create(NewOrganizationRequest request) throws DuplicatedEntityException {
+    public OrganizationResponse create(NewOrganizationRequest request) throws DuplicatedEntityException, IOException {
         if(repository.existsByName(request.getName())){
             throw new DuplicatedEntityException("Organization with name "+request.getName()+" already exists");
         }
         OrganizationEntity entity = mapper.toEntity(request);
+        String image = s3Service.uploadBase64(request.getImage(), "image_"+request.getName());
+        entity.setImage(image);
         entity = repository.save(entity);
         return mapper.toResponse(entity);
     }
@@ -49,14 +55,15 @@ public class OrganizationServiceImpl implements OrganizationService{
 
     @Override
     public OrganizationResponse update(OrganizationUpdate request, Long id)
-            throws NotFoundException, DuplicatedEntityException {
+            throws NotFoundException, DuplicatedEntityException, IOException {
         OrganizationEntity organizationUpdate = getById(id);
         boolean exist = repository.existsByNameAndIdNot(request.getName(), id);
         if(exist){
             throw new DuplicatedEntityException("Organization with name "+request.getName()+" already exists");
         }
+        String image = s3Service.uploadBase64(request.getImage(), "image_"+request.getName());
         organizationUpdate.setName(request.getName());
-        organizationUpdate.setImage(request.getImage());
+        organizationUpdate.setImage(image);
         organizationUpdate.setCanCreateCongress(request.isCanCreateCongress());
         repository.save(organizationUpdate);
         return mapper.toResponse(organizationUpdate);

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ayd2.congress.dtos.acitivty.ActivityResponse;
+import com.ayd2.congress.dtos.acitivty.NewActivityGuest;
 import com.ayd2.congress.dtos.acitivty.NewActivityRequest;
 import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
@@ -76,16 +77,37 @@ public class ActivityServiceImpl implements ActivityService {
         if (startDate.isBefore(congress.getStartDate()) || endDate.isAfter(congress.getEndDate())) {
             throw new IllegalArgumentException("Activity must be scheduled within the congress dates");
         }
-        
-        ActivityEntity activity = new ActivityEntity();
+
+        ActivityEntity activity = activityMapper.toEntity(request);
         activity.setProposal(proposal);
         activity.setRoom(room);
-        activity.setStartDate(startDate);
-        activity.setEndDate(endDate);
-        activity.setName(request.getName());
-        activity.setCapacity(request.getCapacity());
         activityRepository.save(activity);
         return activityMapper.toActivityResponse(activity);
+    }
+
+    @Override
+    public ActivityResponse createActivityWithGuest(NewActivityGuest request,NewProposalRequest proposalRequest)
+            throws NotFoundException, DuplicatedEntityException, InvalidDateRangeException {
+        UserEntity user = userService.getById(proposalRequest.getUserId());
+        ConferenceRoomEntity room = locationService.getRoomById(request.getRoomId());
+        LocalDateTime endDate = request.getEndDate();
+        LocalDateTime startDate = request.getStartDate();
+        if (endDate.isBefore(startDate)) {
+            throw new InvalidDateRangeException("End date must be after start date");
+        }
+        CongressEntity congress = congressService.getById(proposalRequest.getCongressId()   );
+        if (startDate.isBefore(congress.getStartDate()) || endDate.isAfter(congress.getEndDate())) {
+            throw new InvalidDateRangeException("Activity must be scheduled within the congress dates");
+        }
+        ProposalEntity proposalEntity = activityMapper.toProposalEntity(proposalRequest);
+        proposalEntity.setUser(user);
+        proposalEntity.setState(ProposalState.APPROVED);
+        proposalRepository.save(proposalEntity);
+        ActivityEntity activityEntity = activityMapper.toEntity(request);
+        activityEntity.setProposal(proposalEntity);
+        activityEntity.setRoom(room);
+        activityRepository.save(activityEntity);
+        return activityMapper.toActivityResponse(activityEntity);
     }
 
     @Override
@@ -157,13 +179,33 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ProposalResponse updateProposal(Long id, UpdateProposal state) throws NotFoundException {
-        ProposalEntity proposalEntity = getProposalById(id);
-        if (proposalEntity.getState() == ProposalState.REJECTED) 
+    public ProposalResponse updateProposal(Long id, UpdateProposal state)
+            throws NotFoundException, DuplicatedEntityException {
+
+        ProposalEntity proposal = getProposalById(id);
+
+        if (proposal.getState() == ProposalState.REJECTED) {
             throw new NotFoundException("Proposal was rejected");
-        proposalEntity.setState(state.getState());
-        proposalRepository.save(proposalEntity);
-        return activityMapper.toProposalResponse(proposalEntity);
+        }
+        proposal.setState(state.getState());
+
+        if (state.getState() == ProposalState.APPROVED) {
+            inscriptionService.enroll(proposal.getUser().getId(), getRoleIdByProposalType(proposal.getType()),
+                    proposal.getCongress().getId(), true);
+        }
+        proposalRepository.save(proposal);
+        return activityMapper.toProposalResponse(proposal);
+    }
+
+    private Long getRoleIdByProposalType(ActivityType type) {
+        switch (type) {
+            case CONFERENCE:
+                return 3L;
+            case WORKSHOP:
+                return 4L;
+            default:
+                throw new IllegalArgumentException("Unsupported proposal type");
+        }
     }
 
     @Override
@@ -178,7 +220,8 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ActivityResponse updateActivity(Long id, UpdateActivity request) throws NotFoundException,DuplicatedEntityException, InvalidDateRangeException{
+    public ActivityResponse updateActivity(Long id, UpdateActivity request)
+            throws NotFoundException, DuplicatedEntityException, InvalidDateRangeException {
         ActivityEntity activityToUpdate = getActivityById(id);
         ConferenceRoomEntity room = locationService.getRoomById(request.getRoomId());
         LocalDateTime endDate = request.getEndDate();
@@ -192,8 +235,9 @@ public class ActivityServiceImpl implements ActivityService {
             throw new IllegalArgumentException("Activity must be scheduled within the congress dates");
         }
 
-        boolean existsOverLap = activityRepository.existsOverlapExcludingId(request.getRoomId(), request.getStartDate(), request.getEndDate(), id);
-        if(existsOverLap){
+        boolean existsOverLap = activityRepository.existsOverlapExcludingId(request.getRoomId(), request.getStartDate(),
+                request.getEndDate(), id);
+        if (existsOverLap) {
             throw new DuplicatedEntityException("The room is already booked for the given time range");
         }
         activityToUpdate.setCapacity(request.getCapacity());

@@ -8,8 +8,10 @@ import org.springframework.stereotype.Repository;
 import com.ayd2.congress.models.Pay.PaymentEntity;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<PaymentEntity,Long> {
-    boolean existsByUserIdAndCongressId(Long userId,Long congressId);
+public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
+    boolean existsByUserIdAndCongressId(Long userId, Long congressId);
+
     List<PaymentEntity> findAllByUserId(Long userId);
+
     List<PaymentEntity> findAllByCongressId(Long congressId);
 }

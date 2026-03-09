@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ayd2.congress.dtos.Rol.RolResponse;
 import com.ayd2.congress.dtos.User.ConfirmCode;
 import com.ayd2.congress.dtos.User.NewUserRequest;
 import com.ayd2.congress.dtos.User.RecoverPassword;
 import com.ayd2.congress.dtos.User.UpdatePassword;
+import com.ayd2.congress.dtos.User.UserRegister;
 import com.ayd2.congress.dtos.User.UserResponse;
 import com.ayd2.congress.dtos.User.UserUpdate;
 import com.ayd2.congress.exceptions.CodeAlreadyExpiredException;
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository, RolServiceImpl rolService,
             OrganizationServiceImpl organizationService, PasswordEncoder passwordEncoder, UserMapper userMapper,
-            WalletService walletService, S3Service s3Service,MailService mailService) {
+            WalletService walletService, S3Service s3Service, MailService mailService) {
         this.repository = userRepository;
         this.rolService = rolService;
         this.organizationService = organizationService;
@@ -85,6 +87,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse registerUserNormal(UserRegister newUserRequest)
+            throws NotFoundException, DuplicatedEntityException, IOException {
+        NewUserRequest request = userMapper.toRequest(newUserRequest);
+        return create(request);
+    }
+
+    @Override
     public UserEntity getById(Long id) throws NotFoundException {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
     }
@@ -111,7 +120,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateRol(Long rolId,Long userId) throws NotFoundException {
+    public UserResponse updateRol(Long rolId, Long userId) throws NotFoundException {
         UserEntity user = getById(userId);
         RolEntity newRol = rolService.getRolById(rolId);
         user.setRol(newRol);
@@ -162,16 +171,16 @@ public class UserServiceImpl implements UserService {
     public void recoverPassword(RecoverPassword request) throws NotFoundException {
         UserEntity user = getByEmail(request.getEmail());
         String code = generarCodigo();
-        mailService.sendCode("RECUPERACION DE CONTRASE;A", request.getEmail(),code);
-        user.setRecoveryCode(code); 
+        mailService.sendCode("RECUPERACION DE CONTRASE;A", request.getEmail(), code);
+        user.setRecoveryCode(code);
         user.setCodeExpiration(LocalDateTime.now().plusMinutes(15));
         repository.save(user);
     }
 
     @Override
     public void confirmCode(ConfirmCode request) throws NotFoundException, CodeAlreadyExpiredException {
-        boolean exits = repository.existsByRecoveryCodeAndEmail(request.getCode(),request.getEmail());
-        if(!exits){
+        boolean exits = repository.existsByRecoveryCodeAndEmail(request.getCode(), request.getEmail());
+        if (!exits) {
             throw new NotFoundException("Codigo incorrecto");
         }
         UserEntity user = getByEmail(request.getEmail());
@@ -185,11 +194,15 @@ public class UserServiceImpl implements UserService {
         repository.save(user);
     }
 
-
     private String generarCodigo() {
         Random random = new Random();
         int numero = random.nextInt(1_000_000); // 0 a 999999
         return String.format("%06d", numero);
+    }
+
+    @Override
+    public List<RolResponse> getAllRols() {
+        return rolService.getALLResponses();
     }
 
 }

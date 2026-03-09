@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ayd2.congress.dtos.Rol.RolResponse;
 import com.ayd2.congress.dtos.User.ConfirmCode;
 import com.ayd2.congress.dtos.User.NewUserRequest;
 import com.ayd2.congress.dtos.User.RecoverPassword;
@@ -41,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponse> saveUser(@RequestBody NewUserRequest request)
+    public ResponseEntity<UserResponse> saveUser(@Valid @RequestBody NewUserRequest request)
             throws NotFoundException, DuplicatedEntityException, IOException {
         UserResponse response = service.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -57,6 +58,12 @@ public class UserController {
     public ResponseEntity<UserResponse> getById(@Valid @PathVariable Long id) throws NotFoundException {
         UserResponse response = service.getByIdResponse(id);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/rols")
+    public ResponseEntity<List<RolResponse>> getAllRols(){
+        List<RolResponse> responses = service.getAllRols();
+        return ResponseEntity.ok(responses);
     }
 
     @PutMapping("/{id}")

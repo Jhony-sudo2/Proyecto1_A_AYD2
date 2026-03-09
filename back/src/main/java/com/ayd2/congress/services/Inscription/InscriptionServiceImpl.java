@@ -50,17 +50,20 @@ public class InscriptionServiceImpl implements InscriptionService{
     }
 
     @Override
-    public void enroll(Long userId,Long rolId,Long congressId) throws NotFoundException, DuplicatedEntityException {
+    public void enroll(Long userId,Long rolId,Long congressId,boolean ignoreIfExists) throws NotFoundException, DuplicatedEntityException {
         CongressEntity congressEntity = congressService.getById(congressId);
         AttendeeRol rol = getRolById(rolId);
         UserEntity userEntity = userService.getById(userId);
         boolean exists = inscriptionRepository.existsByUserIdAndCongressIdAndAttendeeRolId(userId, congressId, rolId);
         if (exists) {
+            if (ignoreIfExists) {
+                return;
+            }
             throw new DuplicatedEntityException("The User has already registered");
         }
         InscriptionEntity newInscription = new InscriptionEntity();
 
-        AttendeeId attendeeId = new AttendeeId(rolId, userId,rolId);
+        AttendeeId attendeeId = new AttendeeId(congressId, userId,rolId);
         newInscription.setId(attendeeId);
         newInscription.setCongress(congressEntity);
         newInscription.setAttendeeRol(rol);
@@ -95,7 +98,7 @@ public class InscriptionServiceImpl implements InscriptionService{
         newPayment.setUser(userEntity);
         newPayment.setDate(payRequest.getDate());
         newPayment.setTotal(congressEntity.getPrice());
-        enroll(userEntity.getId(), 1L, congressEntity.getId());
+        enroll(userEntity.getId(), 1L, congressEntity.getId(),false);
         paymentRepository.save(newPayment);
         walletService.createTransaction(userEntity.getId(),congressEntity.getPrice(),newPayment);
 

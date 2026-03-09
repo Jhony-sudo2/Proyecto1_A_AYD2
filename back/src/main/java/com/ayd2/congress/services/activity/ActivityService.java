@@ -3,6 +3,7 @@ package com.ayd2.congress.services.activity;
 import java.util.List;
 
 import com.ayd2.congress.dtos.acitivty.ActivityResponse;
+import com.ayd2.congress.dtos.acitivty.NewActivityGuest;
 import com.ayd2.congress.dtos.acitivty.NewActivityRequest;
 import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
@@ -18,6 +19,7 @@ import com.ayd2.congress.models.Enums.ProposalState;
 
 public interface ActivityService {
     ActivityResponse createActivity(NewActivityRequest request) throws NotFoundException,DuplicatedEntityException,InvalidDateRangeException;
+    ActivityResponse createActivityWithGuest(NewActivityGuest request,NewProposalRequest proposalRequest) throws NotFoundException,DuplicatedEntityException,InvalidDateRangeException;
     List<ActivityResponse> getActivitiesByCongressId(Long congressId) throws NotFoundException;
     List<ActivityResponse> getActivitiesByTypeAndCongressId(ActivityType type, Long congressId) throws NotFoundException;
     ProposalResponse createProposal(NewProposalRequest request) throws NotFoundException,DuplicatedEntityException;
@@ -26,7 +28,7 @@ public interface ActivityService {
     List<ProposalResponse> getProposalsByStateAndCongressId(ProposalState state, Long congressId) throws NotFoundException;
     List<ProposalResponse> getProposalByUserId(Long userId) throws NotFoundException;
     ActivityEntity getActivityById(Long id) throws NotFoundException;
-    ProposalResponse updateProposal(Long id,UpdateProposal state) throws NotFoundException;
+    ProposalResponse updateProposal(Long id,UpdateProposal state) throws NotFoundException,DuplicatedEntityException;
     ProposalResponse getProposalResponseById(Long id) throws NotFoundException;
     void deleteAcivity(Long activityId) throws NotFoundException;
     ActivityResponse updateActivity(Long id,UpdateActivity updateActivity) throws NotFoundException,DuplicatedEntityException,InvalidDateRangeException;

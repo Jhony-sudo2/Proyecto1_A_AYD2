@@ -12,4 +12,6 @@ public interface RolService {
     RolResponse createRol(NewRolRequest request) throws DuplicatedEntityException;
     RolEntity getRolById(Long id) throws NotFoundException;
     List<RolEntity> getAllRols();
+    List<RolResponse> getALLResponses();
+    RolResponse getRolResponseById(Long id) throws NotFoundException;
 }

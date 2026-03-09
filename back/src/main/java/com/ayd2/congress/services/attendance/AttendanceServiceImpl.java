@@ -53,7 +53,7 @@ public class AttendanceServiceImpl implements AttendanceService{
         boolean isInscribed = inscriptionService.isUserEnrolledInCongress(user.getId(), congress.getId());
         if(!isInscribed) throw new NotFoundException("User is not inscribed in the congress");
 
-        if(acitivty.getProposal().getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.ATTENDACE){
+        if(acitivty.getProposal().getType() == ActivityType.WORKSHOP && request.getType() == AttendanceType.ATTENDANCE){
             boolean isEnrolled = isEnrolledInWorkshop(user.getId(), acitivty.getId());
             if(!isEnrolled) throw new NotFoundException("User is not enrolled in the workshop");
         }

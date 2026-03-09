@@ -87,7 +87,7 @@ public class ActivityController {
     }
 
     @PutMapping("/proposal/{id}")
-    public ResponseEntity<ProposalResponse> updateProposal(@PathVariable Long id,@RequestBody UpdateProposal request) throws NotFoundException{
+    public ResponseEntity<ProposalResponse> updateProposal(@PathVariable Long id,@RequestBody UpdateProposal request) throws NotFoundException, DuplicatedEntityException{
         ProposalResponse response = activityService.updateProposal(id, request);
         return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(response);
     }

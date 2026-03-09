@@ -1,6 +1,6 @@
 package com.ayd2.congress.models.Activities;
 
-import com.ayd2.congress.compositePrimaryKeys.ProposalManagerId;
+import com.ayd2.congress.compositePrimaryKeys.SpeakerId;
 import com.ayd2.congress.models.User.UserEntity;
 
 import jakarta.persistence.EmbeddedId;
@@ -16,14 +16,14 @@ import lombok.NoArgsConstructor;
 @Table(name = "proposal_manager")
 @Data
 @NoArgsConstructor
-public class ProposalManagerEntity {
+public class SpeakerEntity {
     @EmbeddedId
-    private ProposalManagerId id;
+    private SpeakerId id;
 
-    @MapsId("proposalId")
+    @MapsId("activityId")
     @ManyToOne 
-    @JoinColumn(name = "proposal_id", nullable = false)  
-    private ProposalEntity proposal;
+    @JoinColumn(name = "activity_id", nullable = false)  
+    private ActivityEntity activity;
     @MapsId("userId")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

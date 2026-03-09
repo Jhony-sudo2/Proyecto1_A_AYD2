@@ -3,25 +3,25 @@ package com.ayd2.congress.compositePrimaryKeys;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class ProposalManagerId implements Serializable{
-    private Long proposalId;
+public class SpeakerId implements Serializable{
+    private Long activityId;
     private Long userId;
 
-    public ProposalManagerId() {
+    public SpeakerId() {
     }
 
-    public ProposalManagerId(Long proposalId, Long userId) {
-        this.proposalId = proposalId;
+    public SpeakerId(Long proposalId, Long userId) {
+        this.activityId = proposalId;
         this.userId = userId;
     }
 
     // Getters and Setters
     public Long getProposalId() {
-        return proposalId;
+        return activityId;
     }
 
     public void setProposalId(Long proposalId) {
-        this.proposalId = proposalId;
+        this.activityId = proposalId;
     }
 
     public Long getUserId() {
@@ -36,15 +36,15 @@ public class ProposalManagerId implements Serializable{
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ProposalManagerId))
+        if (!(o instanceof SpeakerId))
             return false;
-        ProposalManagerId that = (ProposalManagerId) o;
-        return Objects.equals(proposalId, that.proposalId)
+        SpeakerId that = (SpeakerId) o;
+        return Objects.equals(activityId, that.activityId)
                 && Objects.equals(userId, that.userId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(proposalId, userId);
+        return Objects.hash(activityId, userId);
     }
 }

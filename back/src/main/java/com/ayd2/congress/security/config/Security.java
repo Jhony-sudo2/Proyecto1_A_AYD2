@@ -47,6 +47,7 @@ public class Security {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.POST, "/auth", "/auth").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register", "/auth").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.POST,"/users/password/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/organizations").permitAll()

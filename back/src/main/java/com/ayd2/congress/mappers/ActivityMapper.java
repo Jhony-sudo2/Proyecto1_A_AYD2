@@ -6,6 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.ayd2.congress.dtos.acitivty.ActivityResponse;
+import com.ayd2.congress.dtos.acitivty.NewActivityGuest;
+import com.ayd2.congress.dtos.acitivty.NewActivityRequest;
 import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
 import com.ayd2.congress.models.Activities.ActivityEntity;
@@ -13,7 +15,19 @@ import com.ayd2.congress.models.Activities.ProposalEntity;
 
 @Mapper(componentModel = "spring")
 public interface ActivityMapper {
-
+    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "room",ignore = true)
+    @Mapping(target = "proposal",ignore = true)
+    @Mapping(target = "state",ignore = true)
+    @Mapping(target = "attendances",ignore = true)
+    ActivityEntity toEntity(NewActivityRequest request);
+    
+    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "room",ignore = true)
+    @Mapping(target = "proposal",ignore = true)
+    @Mapping(target = "state",ignore = true)
+    @Mapping(target = "attendances",ignore = true)
+    ActivityEntity toEntity(NewActivityGuest request);
 
     @Mapping(target = "description", source = "proposal.description")
     @Mapping(target = "type",source = "proposal.type")

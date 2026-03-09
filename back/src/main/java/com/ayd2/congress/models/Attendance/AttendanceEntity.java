@@ -8,6 +8,8 @@ import com.ayd2.congress.models.User.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
@@ -32,6 +34,7 @@ public class AttendanceEntity {
     @ManyToOne
     @JoinColumn(name = "activity_id",nullable = false)
     private ActivityEntity activity;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AttendanceType type;
 }

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public class OrganizationServiceImplTest {
     private OrganizationServiceImpl service;
 
     @Test
-    void createOrganizationTest() throws DuplicatedEntityException{
+    void createOrganizationTest() throws DuplicatedEntityException, IOException{
         NewOrganizationRequest newOrganizationRequest = new NewOrganizationRequest(ORGANIZATION_NAME,ORGANIZATION_IMAGEN);
         ArgumentCaptor<OrganizationEntity> organizationCapture = ArgumentCaptor.forClass(OrganizationEntity.class);
         OrganizationEntity newOrganizationEntity = new OrganizationEntity();
@@ -117,7 +118,7 @@ public class OrganizationServiceImplTest {
     }
 
     @Test
-    void updateTest() throws NotFoundException, DuplicatedEntityException{
+    void updateTest() throws NotFoundException, DuplicatedEntityException, IOException{
         OrganizationEntity entity = new OrganizationEntity();
         entity.setId(ORGANIZATION_ID); 
         entity.setImage(ORGANIZATION_IMAGEN);
