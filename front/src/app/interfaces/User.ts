@@ -1,3 +1,8 @@
+export interface Rol{
+    id:number,
+    name:string
+}
+
 export interface CreateUser {
     identification: string,
     name: string,
@@ -8,6 +13,9 @@ export interface CreateUser {
     nacionality: string,
     organization: number,
     password: string
+}
+export interface CreateUserWithRol extends CreateUser {
+    rol: number
 }
 
 export interface User {

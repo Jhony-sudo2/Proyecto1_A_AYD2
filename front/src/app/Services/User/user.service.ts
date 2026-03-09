@@ -3,7 +3,7 @@ import { environemnt } from '../../../environment/Environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Organization } from '../../interfaces/Organization';
-import { CreateUser, UpdatePassword, UpdateUser, User } from '../../interfaces/User';
+import { CreateUser, Rol, UpdatePassword, UpdateUser, User } from '../../interfaces/User';
 import { Wallet, WalletRecharge } from '../../interfaces/Wallet';
 
 @Injectable({
@@ -65,5 +65,9 @@ export class UserService {
   confirCode(email:string,code:string,newPassword:string){
     const data = {email,code,newPassword}
     return this.http.post(`${this.baseUrl}/password/confirm`,data)
+  }
+
+  getAllRols():Observable<Rol[]>{
+    return this.http.get<Rol[]>(`${this.baseUrl}/rols`)
   }
 }

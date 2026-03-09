@@ -16,6 +16,8 @@ import { AttendanceComponent } from './Activities/attendance/attendance.componen
 import { SystemConfigComponent } from './system-config/system-config.component';
 import { ScientificCommitteeComponent } from './Congress/scientific-committee/scientific-committee.component';
 import { ForgotPasswordComponent } from './User/forgot-password/forgot-password.component';
+import { ReportsComponent } from './reports/reports.component';
+import { OrganizationComponent } from './organization/organization.component';
 
 export const routes: Routes = [
     {path:'auth/login',component:LoginComponent,title:'Login'},
@@ -34,6 +36,8 @@ export const routes: Routes = [
     {path:'atteendance/:id',component:AttendanceComponent,title:'Manejo de asistencias'},
     {path:'sysconfiguration',component:SystemConfigComponent,title:'Configuracion del sistema'},
     {path:'scientificCommittee/:id',component:ScientificCommitteeComponent,title:'Administrado comite cientifo'},
-    {path:'forgot-password',component:ForgotPasswordComponent,title:'Recuperar contrasenia'}
+    {path:'forgot-password',component:ForgotPasswordComponent,title:'Recuperar contrasenia'},
+    {path:'reports',component:ReportsComponent,title:'Reportes'},
+    {path:'organizations',component:OrganizationComponent,title:'Administracion de organizaciones'}
 
 ];

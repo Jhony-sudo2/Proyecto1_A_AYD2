@@ -1,160 +1,191 @@
-<form [formGroup]="form" (ngSubmit)="createUser()" novalidate class="mx-auto max-w-3xl p-6 md:p-8">
-  <div class="mb-6">
-    <h2 class="text-2xl font-semibold tracking-tight">Crear usuario</h2>
-    <p class="mt-1 text-sm text-slate-600">
-      Completa los campos obligatorios para registrar un nuevo usuario.
-    </p>
-  </div>
+<div class="min-h-screen bg-slate-950 flex items-center justify-center px-4 py-12"
+     style="background-image: radial-gradient(ellipse at 20% 50%, rgba(56, 189, 248, 0.07) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);">
 
-  <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+  <div class="w-full max-w-2xl">
 
-    <!-- Identificación -->
-    <div>
-      <label class="block text-sm font-medium text-slate-700">Identificación <span
-          class="text-rose-600">*</span></label>
-      <input type="text" formControlName="identification" placeholder="Ej. 1234567-8" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition
-               border-slate-300 focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        [class.border-rose-500]="isInvalid('identification')" />
-      <div class="mt-1 space-y-1 text-xs text-rose-600" *ngIf="isInvalid('identification')">
-        <p *ngIf="hasError('identification','required')">La identificación es requerida.</p>
-        <p *ngIf="hasError('identification','minlength')">Mínimo 4 caracteres.</p>
-        <p *ngIf="hasError('identification','maxlength')">Máximo 30 caracteres.</p>
-        <p *ngIf="hasError('identification','pattern')">Solo letras, números y guion (-).</p>
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-500 shadow-lg shadow-sky-500/30 mb-4">
+        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+        </svg>
       </div>
+      <h1 class="text-2xl font-bold text-white tracking-tight">
+        {{ rol === 1 ? 'Crear usuario' : 'Crear cuenta' }}
+      </h1>
+      <p class="text-slate-400 text-sm mt-1">
+        {{ rol === 1 ? 'Registra un nuevo usuario en el sistema' : 'Completa tus datos para registrarte' }}
+      </p>
     </div>
 
-    <!-- Email -->
-    <div>
-      <label class="block text-sm font-medium text-slate-700">Email <span class="text-rose-600">*</span></label>
-      <input type="email" formControlName="email" placeholder="correo@dominio.com" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition
-               border-slate-300 focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        [class.border-rose-500]="isInvalid('email')" />
-      <div class="mt-1 space-y-1 text-xs text-rose-600" *ngIf="isInvalid('email')">
-        <p *ngIf="hasError('email','required')">El email es requerido.</p>
-        <p *ngIf="hasError('email','email')">Formato de email inválido.</p>
-        <p *ngIf="hasError('email','maxlength')">Máximo 120 caracteres.</p>
-      </div>
-    </div>
+    <!-- Card -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl shadow-black/40">
 
-    <!-- Nombre -->
-    <div>
-      <label class="block text-sm font-medium text-slate-700">Nombre <span class="text-rose-600">*</span></label>
-      <input type="text" formControlName="name" placeholder="Ej. Juan" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition
-               border-slate-300 focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        [class.border-rose-500]="isInvalid('name')" />
-      <div class="mt-1 space-y-1 text-xs text-rose-600" *ngIf="isInvalid('name')">
-        <p *ngIf="hasError('name','required')">El nombre es requerido.</p>
-        <p *ngIf="hasError('name','minlength')">Mínimo 2 caracteres.</p>
-        <p *ngIf="hasError('name','maxlength')">Máximo 60 caracteres.</p>
-      </div>
-    </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-    <!-- Apellido -->
-    <div>
-      <label class="block text-sm font-medium text-slate-700">Apellido <span class="text-rose-600">*</span></label>
-      <input type="text" formControlName="lastName" placeholder="Ej. Pérez" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition
-               border-slate-300 focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        [class.border-rose-500]="isInvalid('lastName')" />
-      <div class="mt-1 space-y-1 text-xs text-rose-600" *ngIf="isInvalid('lastName')">
-        <p *ngIf="hasError('lastName','required')">El apellido es requerido.</p>
-        <p *ngIf="hasError('lastName','minlength')">Mínimo 2 caracteres.</p>
-        <p *ngIf="hasError('lastName','maxlength')">Máximo 60 caracteres.</p>
-      </div>
-    </div>
-
-    <!-- Teléfono -->
-    <div>
-      <label class="block text-sm font-medium text-slate-700">Teléfono <span class="text-rose-600">*</span></label>
-      <input type="tel" formControlName="phone" placeholder="Ej. +502 5555-5555" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition
-               border-slate-300 focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        [class.border-rose-500]="isInvalid('phone')" />
-      <div class="mt-1 space-y-1 text-xs text-rose-600" *ngIf="isInvalid('phone')">
-        <p *ngIf="hasError('phone','required')">El teléfono es requerido.</p>
-        <p *ngIf="hasError('phone','pattern')">Teléfono inválido (8–20 caracteres).</p>
-      </div>
-    </div>
-
-    <!-- Nacionalidad -->
-    <div>
-      <label class="block text-sm font-medium text-slate-700">Nacionalidad <span class="text-rose-600">*</span></label>
-      <input type="text" formControlName="nacionality" placeholder="Ej. Guatemalteca" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition
-               border-slate-300 focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        [class.border-rose-500]="isInvalid('nacionality')" />
-      <div class="mt-1 space-y-1 text-xs text-rose-600" *ngIf="isInvalid('nacionality')">
-        <p *ngIf="hasError('nacionality','required')">La nacionalidad es requerida.</p>
-        <p *ngIf="hasError('nacionality','minlength')">Mínimo 2 caracteres.</p>
-        <p *ngIf="hasError('nacionality','maxlength')">Máximo 60 caracteres.</p>
-      </div>
-    </div>
-
-    <!-- Organización -->
-    <div>
-      <label class="block text-sm font-medium text-slate-700">Organización <span class="text-rose-600">*</span></label>
-      <select formControlName="organization" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition
-               border-slate-300 focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        [class.border-rose-500]="isInvalid('organization')">
-        <option [ngValue]="null" disabled>Seleccione una organización</option>
-        <option *ngFor="let org of organizations" [ngValue]="org.id">
-          {{ org.name }}
-        </option>
-      </select>
-      <div class="mt-1 space-y-1 text-xs text-rose-600" *ngIf="isInvalid('organization')">
-        <p *ngIf="hasError('organization','required')">Debe seleccionar una organización.</p>
-      </div>
-    </div>
-
-    <!-- Imagen (archivo -> base64) -->
-    <div class="md:col-span-2">
-      <label class="block text-sm font-medium text-slate-700">Imagen (PNG/JPG/WEBP, máx 2MB)</label>
-
-      <div class="mt-1 flex flex-col gap-3 md:flex-row md:items-center">
-        <input type="file" accept="image/png,image/jpeg,image/webp" (change)="onImageSelected($event)" class="block w-full text-sm file:mr-4 file:rounded-xl file:border-0
-             file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold
-             file:text-white hover:file:bg-slate-800
-             text-slate-700" />
-
-        <button type="button" (click)="clearImage()" class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700
-             shadow-sm hover:bg-slate-50 transition">
-          Quitar
-        </button>
-      </div>
-
-      <p *ngIf="imageError" class="mt-2 text-xs text-rose-600">{{ imageError }}</p>
-
-      <div *ngIf="imagePreview" class="mt-3 flex items-center gap-4">
-        <img [src]="imagePreview" alt="Preview" class="h-20 w-20 rounded-xl object-cover border border-slate-200" />
-        <div class="text-xs text-slate-600">
-          <p class="font-medium text-slate-700">Vista previa</p>
-          <p>Se enviará como Base64 en el campo <span class="font-mono">imageUrl</span>.</p>
+        <!-- Identificación -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">No. Identificación</label>
+          <input type="text" [(ngModel)]="userCreate.identification" name="identification"
+            placeholder="Ej. 1234567890101"
+            class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
         </div>
+
+        <!-- Nacionalidad -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Nacionalidad</label>
+          <input type="text" [(ngModel)]="userCreate.nacionality" name="nacionality"
+            placeholder="Ej. Guatemalteco"
+            class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+        </div>
+
+        <!-- Nombre -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Nombre</label>
+          <input type="text" [(ngModel)]="userCreate.name" name="name"
+            placeholder="Ej. Juan"
+            class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+        </div>
+
+        <!-- Apellido -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Apellido</label>
+          <input type="text" [(ngModel)]="userCreate.lastName" name="lastName"
+            placeholder="Ej. Pérez"
+            class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+        </div>
+
+        <!-- Correo -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Correo electrónico</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>
+            </span>
+            <input type="email" [(ngModel)]="userCreate.email" name="email"
+              placeholder="tucorreo@ejemplo.com"
+              class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+          </div>
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Teléfono</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+              </svg>
+            </span>
+            <input type="tel" [(ngModel)]="userCreate.phone" name="phone"
+              placeholder="Ej. 55551234"
+              class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Contraseña</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+            </span>
+            <input [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="userCreate.password" name="password"
+              placeholder="••••••••"
+              class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl pl-10 pr-10 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+            <button type="button" (click)="showPassword = !showPassword"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-slate-300">
+              <svg *ngIf="!showPassword" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <svg *ngIf="showPassword" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Organización -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Organización</label>
+          <div class="relative">
+            <select [(ngModel)]="userCreate.organization" name="organization"
+              class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200 appearance-none">
+              <option [value]="0" disabled>Selecciona una organización</option>
+              <option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</option>
+            </select>
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 pointer-events-none">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Rol (solo admin) -->
+        <div *ngIf="rol === 1" class="md:col-span-2">
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+            Rol
+            <span class="ml-2 text-sky-400 normal-case font-normal">(solo visible para administradores)</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <label *ngFor="let r of rols" class="relative cursor-pointer">
+              <input type="radio" [(ngModel)]="userCreate.rol" name="rol" [value]="r.id" class="sr-only" />
+              <div class="flex items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200"
+                   [ngClass]="userCreate.rol === r.id
+                     ? 'border-sky-500 bg-sky-500/10'
+                     : 'border-slate-700 bg-slate-800 hover:border-slate-600'">
+                <div class="w-2 h-2 rounded-full shrink-0"
+                     [ngClass]="userCreate.rol === r.id ? 'bg-sky-400' : 'bg-slate-600'"></div>
+                <p class="text-sm font-semibold truncate"
+                   [ngClass]="userCreate.rol === r.id ? 'text-sky-400' : 'text-slate-300'">
+                  {{ r.name }}
+                </p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Imagen -->
+        <div class="md:col-span-2">
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Foto de perfil</label>
+          <label class="flex items-center gap-3 w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 cursor-pointer hover:border-sky-500 transition-all duration-200 group">
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-sky-400 transition-colors shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            <span class="text-sm truncate" [ngClass]="userCreate.imageUrl ? 'text-sky-400' : 'text-slate-600'">
+              {{ userCreate.imageUrl ? 'Imagen cargada ✓' : 'Selecciona una foto de perfil...' }}
+            </span>
+            <input type="file" accept="image/*" (change)="onImageSelected($event)" class="hidden" />
+          </label>
+        </div>
+
       </div>
-    </div>
-    <!-- Password -->
-    <div class="md:col-span-2">
-      <label class="block text-sm font-medium text-slate-700">Contraseña <span class="text-rose-600">*</span></label>
-      <input type="password" formControlName="password" placeholder="Mínimo 8 (mayúscula, minúscula y número)" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition
-               border-slate-300 focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-        [class.border-rose-500]="isInvalid('password')" />
-      <div class="mt-1 grid gap-1 text-xs text-rose-600" *ngIf="isInvalid('password')">
-        <p *ngIf="hasError('password','required')">La contraseña es requerida.</p>
-        <p *ngIf="hasError('password','minlength')">Mínimo 8 caracteres.</p>
-        <p *ngIf="hasError('password','maxlength')">Máximo 64 caracteres.</p>
-        <p *ngIf="hasError('password','pattern')">Debe incluir mayúscula, minúscula y número.</p>
+
+      <!-- Divider -->
+      <div class="h-px bg-slate-800 my-6"></div>
+
+      <!-- Botón -->
+      <button (click)="rol === 1 ? createUserWithRol() : createUserNormal()"
+        class="w-full py-3 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 shadow-lg shadow-sky-500/20 active:scale-95 transition-all duration-200">
+        {{ rol === 1 ? 'Crear usuario' : 'Registrarme' }}
+      </button>
+
+      <!-- Link login (solo registro normal) -->
+      <div *ngIf="rol !== 1" class="text-center mt-4">
+        <p class="text-sm text-slate-500">
+          ¿Ya tienes cuenta?
+          <a routerLink="/login" class="text-sky-400 hover:text-sky-300 font-medium transition-colors ml-1">
+            Inicia sesión
+          </a>
+        </p>
       </div>
+
     </div>
-
   </div>
-
-  <div class="mt-7 flex items-center justify-end gap-3">
-    <button type="button"
-      class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition"
-      (click)="form.reset()">
-      Limpiar
-    </button>
-
-    <button type="submit" [disabled]="form.invalid" class="rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition
-             disabled:cursor-not-allowed disabled:opacity-60">
-      Crear usuario
-    </button>
-  </div>
-</form>
+</div>

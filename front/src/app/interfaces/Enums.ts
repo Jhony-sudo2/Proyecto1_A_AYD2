@@ -4,7 +4,7 @@ export enum ProposalType {
 }
 
 export enum AttendanceType {
-  ATTENDACE = 'ATTENDACE',
+  ATTENDANCE = 'ATTENDANCE',
   WORKSHOPINSCRIPTION = 'WORKSHOPINSCRIPTION',
 }
 

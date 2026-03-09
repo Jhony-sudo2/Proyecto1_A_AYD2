@@ -1,0 +1,406 @@
+<div class="min-h-screen bg-slate-950 px-4 py-12"
+     style="background-image: radial-gradient(ellipse at 20% 50%, rgba(56, 189, 248, 0.07) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-white">Reportes</h1>
+      <p class="text-slate-500 text-sm mt-1">Consulta y filtra la información del sistema</p>
+    </div>
+
+    <!-- Tabs principales -->
+    <div class="flex gap-2 mb-8 bg-slate-900 border border-slate-800 rounded-2xl p-1.5 w-fit">
+      <button *ngFor="let tab of mainTabs" (click)="activeTab = tab.id"
+        class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+        [ngClass]="activeTab === tab.id
+          ? 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-md'
+          : 'text-slate-500 hover:text-slate-300'">
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- ===================== ADMIN SISTEMA ===================== -->
+
+    <!-- Reporte de ganancias por intervalo -->
+    <div *ngIf="activeTab === 'earnings'">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+        <h2 class="text-white font-bold text-lg mb-4">Filtros</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Fecha inicio</label>
+            <input type="datetime-local" [(ngModel)]="earningFilter.startDate" name="earningStart"
+              class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Fecha fin</label>
+            <input type="datetime-local" [(ngModel)]="earningFilter.endDate" name="earningEnd"
+              class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Institución (opcional)</label>
+            <input type="number" [(ngModel)]="earningFilter.organizationId" name="orgId"
+              placeholder="ID de institución"
+              class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+          </div>
+        </div>
+        <button (click)="loadEarnings()"
+          class="mt-4 px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 active:scale-95 transition-all duration-200">
+          Generar reporte
+        </button>
+      </div>
+
+      <!-- Totales -->
+      <div *ngIf="earningReports.length > 0" class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <p class="text-slate-500 text-xs uppercase tracking-widest mb-1">Total recaudado</p>
+          <p class="text-3xl font-bold text-white">Q{{ totalCollected | number:'1.2-2' }}</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <p class="text-slate-500 text-xs uppercase tracking-widest mb-1">Total ganancia</p>
+          <p class="text-3xl font-bold text-emerald-400">Q{{ totalProfit | number:'1.2-2' }}</p>
+        </div>
+      </div>
+
+      <!-- Tabla agrupada por institución -->
+      <div *ngIf="earningReports.length > 0">
+        <div *ngFor="let group of earningGrouped" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-4">
+          <!-- Header institución -->
+          <div class="px-5 py-3 bg-slate-800/50 border-b border-slate-800 flex items-center justify-between">
+            <h3 class="text-white font-bold flex items-center gap-2">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+              </svg>
+              {{ group.organization }}
+            </h3>
+            <span class="text-xs text-slate-500">{{ group.reports.length }} congreso(s)</span>
+          </div>
+          <!-- Tabla congresos -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-slate-800">
+                  <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Congreso</th>
+                  <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Ubicación</th>
+                  <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Fechas</th>
+                  <th class="text-right text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Recaudado</th>
+                  <th class="text-right text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Ganancia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of group.reports" class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                  <td class="px-5 py-3 text-white font-semibold">{{ r.congressName }}</td>
+                  <td class="px-5 py-3 text-slate-400">{{ r.locationName }}</td>
+                  <td class="px-5 py-3 text-slate-400 text-xs">
+                    {{ r.startDate | date:'dd MMM yyyy' }} — {{ r.endDate | date:'dd MMM yyyy' }}
+                  </td>
+                  <td class="px-5 py-3 text-right text-white">Q{{ r.totalCollected | number:'1.2-2' }}</td>
+                  <td class="px-5 py-3 text-right text-emerald-400 font-semibold">Q{{ r.totalProfit | number:'1.2-2' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="earningReports.length === 0 && earningsLoaded" class="text-center py-16 text-slate-600">
+        <p>No se encontraron resultados para los filtros seleccionados</p>
+      </div>
+    </div>
+
+    <!-- ===================== ADMIN CONGRESOS ===================== -->
+
+    <!-- Participantes -->
+    <div *ngIf="activeTab === 'participants'">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+        <h2 class="text-white font-bold text-lg mb-4">Filtros</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Congreso</label>
+            <div class="relative">
+              <select [(ngModel)]="inscriptionFilter.congressId" name="inscCongress"
+                class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200 appearance-none">
+                <option [value]="0" disabled>Selecciona un congreso</option>
+                <option *ngFor="let c of congress" [value]="c.id">{{ c.name }}</option>
+              </select>
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 pointer-events-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+              </span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Tipo de participante (opcional)</label>
+            <input type="number" [(ngModel)]="inscriptionFilter.attendeeType" name="attendeeType"
+              placeholder="ID del tipo"
+              class="w-full bg-slate-800 text-white text-sm placeholder-slate-600 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all duration-200" />
+          </div>
+        </div>
+        <button (click)="loadParticipants()"
+          class="mt-4 px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 active:scale-95 transition-all duration-200">
+          Generar reporte
+        </button>
+      </div>
+
+      <div *ngIf="inscriptionReports.length > 0" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+          <p class="text-white font-bold">{{ inscriptionReports.length }} participantes</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-800">
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Identificación</th>
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Nombre</th>
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Organización</th>
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Correo</th>
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Teléfono</th>
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Tipo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of inscriptionReports" class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                <td class="px-5 py-3 text-slate-400 font-mono text-xs">{{ p.identification }}</td>
+                <td class="px-5 py-3 text-white font-semibold">{{ p.name }}</td>
+                <td class="px-5 py-3 text-slate-400">{{ p.organizationName }}</td>
+                <td class="px-5 py-3 text-slate-400">{{ p.email }}</td>
+                <td class="px-5 py-3 text-slate-400">{{ p.phone }}</td>
+                <td class="px-5 py-3">
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    {{ p.attendeeRolName }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Asistencia por actividad -->
+    <div *ngIf="activeTab === 'attendance'">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+        <h2 class="text-white font-bold text-lg mb-4">Filtros</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Congreso</label>
+            <div class="relative">
+              <select [(ngModel)]="selectedCongressForActivity" (ngModelChange)="loadActivitiesForReport($event)" name="congressAct"
+                class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200 appearance-none">
+                <option [value]="0">Todos</option>
+                <option *ngFor="let c of congress" [value]="c.id">{{ c.name }}</option>
+              </select>
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 pointer-events-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+              </span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Actividad (opcional)</label>
+            <div class="relative">
+              <select [(ngModel)]="attendanceFilter.activityId" name="activityId"
+                class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200 appearance-none">
+                <option [value]="undefined">Todas</option>
+                <option *ngFor="let a of activities" [value]="a.id">{{ a.name }}</option>
+              </select>
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 pointer-events-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+              </span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Fecha inicio</label>
+            <input type="datetime-local" [(ngModel)]="attendanceFilter.startDate" name="attStart"
+              class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Fecha fin</label>
+            <input type="datetime-local" [(ngModel)]="attendanceFilter.endDate" name="attEnd"
+              class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200" />
+          </div>
+        </div>
+        <button (click)="loadAttendance()"
+          class="mt-4 px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 active:scale-95 transition-all duration-200">
+          Generar reporte
+        </button>
+      </div>
+
+      <div *ngIf="attendanceReports.length > 0" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/50">
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Actividad</th>
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Salón</th>
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Fecha y hora</th>
+                <th class="text-right text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Asistencias</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of attendanceReports" class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                <td class="px-5 py-3 text-white font-semibold">{{ a.activityName }}</td>
+                <td class="px-5 py-3 text-slate-400">{{ a.roomName }}</td>
+                <td class="px-5 py-3 text-slate-400 text-xs">{{ a.startDate | date:'dd MMM yyyy, HH:mm' }}</td>
+                <td class="px-5 py-3 text-right">
+                  <span class="text-sky-400 font-bold text-lg">{{ a.attendances }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Talleres -->
+    <div *ngIf="activeTab === 'workshops'">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+        <h2 class="text-white font-bold text-lg mb-4">Filtros</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Congreso</label>
+            <div class="relative">
+              <select [(ngModel)]="workshopFilter.congressId" name="wsCongress"
+                class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200 appearance-none">
+                <option [value]="0" disabled>Selecciona un congreso</option>
+                <option *ngFor="let c of congress" [value]="c.id">{{ c.name }}</option>
+              </select>
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 pointer-events-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+              </span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Taller (opcional)</label>
+            <div class="relative">
+              <select [(ngModel)]="workshopFilter.activityId" name="wsActivity"
+                class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200 appearance-none">
+                <option [value]="undefined">Todos</option>
+                <option *ngFor="let a of activities" [value]="a.id">{{ a.name }}</option>
+              </select>
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 pointer-events-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+        <button (click)="loadWorkshops()"
+          class="mt-4 px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 active:scale-95 transition-all duration-200">
+          Generar reporte
+        </button>
+      </div>
+
+      <div *ngIf="workshopReports.length > 0" class="space-y-4">
+        <div *ngFor="let ws of workshopReports" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+          <!-- Header taller -->
+          <div class="px-5 py-4 border-b border-slate-800 flex flex-wrap items-center gap-4 justify-between">
+            <h3 class="text-white font-bold">{{ ws.workshopName }}</h3>
+            <div class="flex items-center gap-4 text-sm">
+              <span class="text-slate-500">Cupo total: <span class="text-white font-semibold">{{ ws.capacity }}</span></span>
+              <span class="text-slate-500">Reservas: <span class="text-sky-400 font-semibold">{{ ws.total }}</span></span>
+              <span class="text-slate-500">Disponibles: <span class="text-emerald-400 font-semibold">{{ ws.available }}</span></span>
+              <!-- Barra ocupación -->
+              <div class="flex items-center gap-2">
+                <div class="w-20 h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full"
+                       [ngClass]="(ws.total/ws.capacity*100) > 80 ? 'bg-red-400' : (ws.total/ws.capacity*100) > 50 ? 'bg-amber-400' : 'bg-emerald-400'"
+                       [style.width.%]="ws.total/ws.capacity*100"></div>
+                </div>
+                <span class="text-xs text-slate-500">{{ (ws.total/ws.capacity*100) | number:'1.0-0' }}%</span>
+              </div>
+            </div>
+          </div>
+          <!-- Participantes -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-950/30">
+                  <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-2">Identificación</th>
+                  <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-2">Nombre</th>
+                  <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-2">Correo</th>
+                  <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-2">Tipo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of ws.participants" class="border-b border-slate-800/40 hover:bg-slate-800/20 transition-colors">
+                  <td class="px-5 py-2.5 text-slate-400 font-mono text-xs">{{ p.identification }}</td>
+                  <td class="px-5 py-2.5 text-white">{{ p.fullName }}</td>
+                  <td class="px-5 py-2.5 text-slate-400">{{ p.email }}</td>
+                  <td class="px-5 py-2.5">
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                      {{ p.attendeeRolName }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ganancias por congreso -->
+    <div *ngIf="activeTab === 'earningsCongress'">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+        <h2 class="text-white font-bold text-lg mb-4">Filtros</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Congreso (opcional)</label>
+            <div class="relative">
+              <select [(ngModel)]="earningCongressFilter.congressId" name="ecCongress"
+                class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200 appearance-none">
+                <option [value]="undefined">Todos</option>
+                <option *ngFor="let c of congress" [value]="c.id">{{ c.name }}</option>
+              </select>
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 pointer-events-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+              </span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Fecha inicio</label>
+            <input type="datetime-local" [(ngModel)]="earningCongressFilter.startDate" name="ecStart"
+              class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Fecha fin</label>
+            <input type="datetime-local" [(ngModel)]="earningCongressFilter.endDate" name="ecEnd"
+              class="w-full bg-slate-800 text-white text-sm border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 transition-all duration-200" />
+          </div>
+        </div>
+        <button (click)="loadEarningsCongress()"
+          class="mt-4 px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 active:scale-95 transition-all duration-200">
+          Generar reporte
+        </button>
+      </div>
+
+      <div *ngIf="earningCongressReports.length > 0" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/50">
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Congreso</th>
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Institución</th>
+                <th class="text-left text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Fechas</th>
+                <th class="text-right text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Total</th>
+                <th class="text-right text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Comisión</th>
+                <th class="text-right text-xs text-slate-500 font-semibold uppercase tracking-widest px-5 py-3">Ganancia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of earningCongressReports" class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                <td class="px-5 py-3 text-white font-semibold">{{ r.congress.name }}</td>
+                <td class="px-5 py-3 text-slate-400">{{ r.congress.organizationName }}</td>
+                <td class="px-5 py-3 text-slate-400 text-xs">
+                  {{ r.congress.startDate | date:'dd MMM yyyy' }} — {{ r.congress.endDate | date:'dd MMM yyyy' }}
+                </td>
+                <td class="px-5 py-3 text-right text-white">Q{{ r.total | number:'1.2-2' }}</td>
+                <td class="px-5 py-3 text-right text-amber-400">Q{{ r.commission | number:'1.2-2' }}</td>
+                <td class="px-5 py-3 text-right text-emerald-400 font-bold">Q{{ r.earning | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environemnt } from '../../../environment/Environment';
-import { Activity, CreateActivity, CreateProposal, Proposal, updateActivity } from '../../interfaces/Activity';
+import { Activity, CreateActivity, CreateActivityGuest, CreateProposal, Proposal, updateActivity } from '../../interfaces/Activity';
 import { Observable } from 'rxjs';
 import { ProposalState } from '../../interfaces/Enums';
 
@@ -14,6 +14,10 @@ export class ActivityService {
 
   createActivity(data: CreateActivity): Observable<Activity> {
     return this.http.post<Activity>(this.baseUrl, data);
+  }
+
+  createActivityGuest(data:CreateActivityGuest):Observable<Activity>{
+    return this.http.post<Activity>(`${this.baseUrl}/guest`,data)
   }
 
   updateActivity(data:updateActivity,id:number):Observable<Activity>{    

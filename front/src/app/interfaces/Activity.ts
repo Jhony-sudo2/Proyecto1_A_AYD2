@@ -5,11 +5,13 @@ export interface Activity {
   id: number,
   name: string,
   description: string,
-  roomId:number
+  roomId:number,
+  roomName:string,
   startDate: string,
   endDate: string,
   type: string,
-  capacity: number
+  capacity: number,
+  speakers:string[]
 }
 
 export interface CreateActivity {
@@ -19,6 +21,18 @@ export interface CreateActivity {
   startDate: Date,
   endDate: Date,
   capacity: number
+}
+
+export interface CreateActivityGuest{
+  name:string,
+  roomId:number,
+  startDate:Date,
+  endDate: Date,
+  capacity: number
+  users:number[]
+  congressId:number,
+  description:string,
+  type:ProposalType
 }
 
 export interface updateActivity{

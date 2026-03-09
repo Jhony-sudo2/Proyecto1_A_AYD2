@@ -48,7 +48,7 @@ export class AttendanceComponent {
       activityId: activity.id,
       userIdentification: '',
       date: '',
-      type: AttendanceType.ATTENDACE  // siempre ATTENDACE
+      type: AttendanceType.ATTENDANCE  // siempre ATTENDACE
     };
     this.getAtteendancesByActivityId(activity.id);
   }

@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { environemnt } from '../../../environment/Environment';
 import { HttpClient } from '@angular/common/http';
 import { Login, LoginResponse } from '../../interfaces/Auth';
-import { tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
+import { CreateUser, User } from '../../interfaces/User';
 
 @Injectable({
   providedIn: 'root'
@@ -67,9 +68,26 @@ export class AuthService {
     if (!payload) return 0;
 
     const raw =
-      payload.id 
+      payload.id
     const id = Number(raw);
     return Number.isFinite(id) ? id : 0;
+  }
+
+  getRol(): number {
+    const token = this.getToken()
+    if (!token) return 0;
+
+    const payload = this.decodeJwtPayload(token);
+    if (!payload) return 0;
+
+    const raw =
+      payload.rolId
+    const rolId = Number(raw);
+    return Number.isFinite(rolId) ? rolId : 0;
+  }
+
+  registerUser(data: CreateUser): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/register`, data)
   }
 
 }

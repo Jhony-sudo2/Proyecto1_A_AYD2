@@ -1,19 +1,22 @@
 import { Component } from '@angular/core';
 import { ActivityService } from '../../Services/Activity/activity.service';
 import { LocationService } from '../../Services/Location/location.service';
-import { Activity, CreateActivity, Proposal, updateActivity } from '../../interfaces/Activity';
+import { Activity, CreateActivity, CreateActivityGuest, Proposal, updateActivity } from '../../interfaces/Activity';
 import { Room } from '../../interfaces/Location';
 import { CongressResponse } from '../../interfaces/Congress';
 import { ActivatedRoute } from '@angular/router';
 import { CongressService } from '../../Services/Congress/congress.service';
-import { ProposalState } from '../../interfaces/Enums';
+import { ProposalState, ProposalType } from '../../interfaces/Enums';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { User } from '../../interfaces/User';
+import { UserService } from '../../Services/User/user.service';
+import { ActivityCardComponent } from '../activity-card/activity-card.component';
 
 @Component({
   selector: 'app-create-activity',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,ActivityCardComponent],
   templateUrl: './create-activity.component.html',
   styleUrl: './create-activity.component.css'
 })
@@ -25,7 +28,13 @@ export class CreateActivityComponent {
   congress: CongressResponse = {} as CongressResponse
   proposals: Proposal[] = []
   editingId: number | null = null;
-  constructor(private service: ActivityService, private locationService: LocationService, private route: ActivatedRoute, private congressService: CongressService) { }
+  users: User[] = []
+  activeForm: 'proposal' | 'guest' = 'proposal';
+  ProposalType = ProposalType;
+
+  guestCreate: CreateActivityGuest = { users: [] } as any;
+  userSearch: string = '';
+  constructor(private service: ActivityService, private locationService: LocationService, private route: ActivatedRoute, private congressService: CongressService, private userService: UserService) { }
 
   ngOnInit() {
     const congressId = parseInt(this.route.snapshot.paramMap.get('id')!);
@@ -38,6 +47,9 @@ export class CreateActivityComponent {
         this.service.getProposalByCongressIdAndState(congressId, ProposalState.APPROVED).subscribe({
           next: (response) => { this.proposals = response }
         })
+        this.userService.getAllUser().subscribe({
+          next: (response) => { this.users = response }
+        })
       }
     })
     this.service.getActivitiesByCongressId(congressId).subscribe({
@@ -45,8 +57,6 @@ export class CreateActivityComponent {
         this.activities = response
       }
     })
-
-
   }
   get selectedProposal(): Proposal | undefined {
     return this.proposals.find(p => p.id === +this.activityCreate.proposalId);
@@ -63,7 +73,7 @@ export class CreateActivityComponent {
     });
   }
 
-  
+
 
   startEdit(activity: Activity) {
     this.editingId = activity.id;
@@ -118,5 +128,39 @@ export class CreateActivityComponent {
     });
   }
 
+  get filteredUsers(): User[] {
+    const term = this.userSearch.toLowerCase();
+    if (!term) return this.users;
+    return this.users.filter(u =>
+      u.name.toLowerCase().includes(term) ||
+      u.lastName.toLowerCase().includes(term)
+    );
+  }
 
+  get selectedUsers(): User[] {
+    return this.users.filter(u => this.guestCreate.users.includes(u.id));
+  }
+
+  toggleUser(userId: number) {
+    const index = this.guestCreate.users.indexOf(userId);
+    if (index === -1) this.guestCreate.users.push(userId);
+    else this.guestCreate.users.splice(index, 1);
+  }
+
+  isSelected(userId: number): boolean {
+    return this.guestCreate.users.includes(userId);
+  }
+
+  crearActividadGuest() {
+    this.guestCreate.congressId = this.congress.id;
+    this.service.createActivityGuest(this.guestCreate).subscribe({
+      next: (response) => {
+        this.activities.push(response);
+        this.guestCreate = { users: [] } as any;
+        this.userSearch = '';
+        Swal.fire({ title: 'OK', text: 'Actividad con invitados creada', icon: 'success' });
+      },
+      error: (err) => Swal.fire({ title: 'Error', text: err.error, icon: 'error' })
+    });
+  }
 }
