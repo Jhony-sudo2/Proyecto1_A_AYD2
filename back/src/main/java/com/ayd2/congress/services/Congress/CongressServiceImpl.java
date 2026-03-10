@@ -168,7 +168,7 @@ public class CongressServiceImpl implements CongressService {
 
     @Override
     public void removeCommitteeMember(Long congressId, Long userId) throws NotFoundException {
-        getById(userId);
+        getById(congressId);
         userService.getById(userId);
         boolean exists = commiteeRepository.existsByUserIdAndCongressId(userId, congressId);
         if(!exists){

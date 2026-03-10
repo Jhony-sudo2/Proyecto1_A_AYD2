@@ -52,6 +52,7 @@ public class Security {
                         .requestMatchers(HttpMethod.POST,"/users/password/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/organizations").permitAll()
                         .requestMatchers(HttpMethod.GET, "/congresses/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/activities/**").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",

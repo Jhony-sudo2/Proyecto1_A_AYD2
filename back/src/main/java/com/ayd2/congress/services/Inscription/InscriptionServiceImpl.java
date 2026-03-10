@@ -36,6 +36,7 @@ public class InscriptionServiceImpl implements InscriptionService{
     private final CongressService congressService;
     private final WalletService walletService;
     private final InscriptionMapper inscriptionMapper;
+    private final Long ASSISTENT_ROL = 1L;
 
     public InscriptionServiceImpl(UserService userService, PaymentRepository paymentRepository,
             InscriptionRepository inscriptionRepository, AttendeeRolRepository attendeeRolRepository,CongressService congressService
@@ -98,7 +99,7 @@ public class InscriptionServiceImpl implements InscriptionService{
         newPayment.setUser(userEntity);
         newPayment.setDate(payRequest.getDate());
         newPayment.setTotal(congressEntity.getPrice());
-        enroll(userEntity.getId(), 1L, congressEntity.getId(),false);
+        enroll(userEntity.getId(), ASSISTENT_ROL, congressEntity.getId(),false);
         paymentRepository.save(newPayment);
         walletService.createTransaction(userEntity.getId(),congressEntity.getPrice(),newPayment);
 

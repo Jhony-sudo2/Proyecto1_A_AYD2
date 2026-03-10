@@ -38,6 +38,7 @@ public class OrganizationServiceImpl implements OrganizationService{
         OrganizationEntity entity = mapper.toEntity(request);
         String image = s3Service.uploadBase64(request.getImage(), "image_"+request.getName());
         entity.setImage(image);
+        entity.setCanCreateCongress(false);
         entity = repository.save(entity);
         return mapper.toResponse(entity);
     }

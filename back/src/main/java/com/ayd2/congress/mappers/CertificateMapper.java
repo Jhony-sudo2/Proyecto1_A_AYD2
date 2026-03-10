@@ -16,5 +16,6 @@ public interface CertificateMapper {
     @Mapping(target = "name",             source = "user.name")
     @Mapping(target = "lastName",         source = "user.lastName")
     @Mapping(target = "date",             expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "assitantType",source = "rol.name")
     CertificateResponse toResponse(CertificateEntity entity);
 }

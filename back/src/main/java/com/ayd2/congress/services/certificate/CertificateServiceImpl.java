@@ -13,6 +13,7 @@ import com.ayd2.congress.mappers.CertificateMapper;
 import com.ayd2.congress.models.Attendance.AttendanceEntity;
 import com.ayd2.congress.models.Congress.CertificateEntity;
 import com.ayd2.congress.models.Congress.InscriptionEntity;
+import com.ayd2.congress.models.Enums.AttendanceType;
 import com.ayd2.congress.repositories.Congress.CertificateRepository;
 import com.ayd2.congress.repositories.Congress.InscriptionRepository;
 import com.ayd2.congress.services.User.UserService;
@@ -53,7 +54,7 @@ public class CertificateServiceImpl implements CertificateService {
             List<AttendanceEntity> attendances =
                     attendanceService.getAttendanceByUserIdAndCongressId(
                             inscription.getUser().getId(),
-                            inscription.getCongress().getId());
+                            inscription.getCongress().getId(),AttendanceType.ATTENDANCE);
 
             if (attendances.size() >= MIN_ATTENDANCES_FOR_CERTIFICATE) {
                 return Optional.of(saveCertificate(inscription));

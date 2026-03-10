@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +19,8 @@ import com.ayd2.congress.exceptions.InsufficientFundsException;
 import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.services.Inscription.InscriptionService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/inscriptions")
 public class InscriptionController {
@@ -31,7 +32,7 @@ public class InscriptionController {
     }
     
     @PostMapping("/pay")
-    public ResponseEntity<PayResponse> pay(@Validated @RequestBody PayRequest request) throws NotFoundException, InsufficientFundsException, DuplicatedEntityException{
+    public ResponseEntity<PayResponse> pay(@Valid @RequestBody PayRequest request) throws NotFoundException, InsufficientFundsException, DuplicatedEntityException{
         PayResponse response = service.pay(request);
         return  ResponseEntity.ok(response);
     }

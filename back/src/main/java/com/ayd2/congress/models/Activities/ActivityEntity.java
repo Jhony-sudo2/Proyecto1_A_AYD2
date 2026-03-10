@@ -54,6 +54,6 @@ public class ActivityEntity {
     private ActivityType type;
     @OneToMany(mappedBy = "activity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AttendanceEntity> attendances;
-    @OneToMany(mappedBy = "activity")
+    @OneToMany(mappedBy = "activity",cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<SpeakerEntity> speakers;
 }

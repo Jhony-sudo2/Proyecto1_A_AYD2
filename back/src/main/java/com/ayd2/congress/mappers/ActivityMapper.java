@@ -51,6 +51,7 @@ public interface ActivityMapper {
     @Mapping(target = "congress", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "state", ignore = true)
+    @Mapping(target = "used",ignore = true)
     ProposalEntity toProposalEntity(NewProposalRequest request);
 
     default String[] map(List<SpeakerEntity> speakers) {

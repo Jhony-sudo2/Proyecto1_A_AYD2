@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ayd2.congress.dtos.acitivty.ActivityResponse;
 import com.ayd2.congress.dtos.attendance.AttendanceResponse;
 import com.ayd2.congress.dtos.attendance.NewAttendanceRequest;
 import com.ayd2.congress.exceptions.ActivityAlreadyEndendException;
@@ -47,6 +48,12 @@ public class AttendanceController {
             throws NotFoundException {
 
         List<AttendanceResponse> responses = attendanceService.getAttendanceByUserId(userId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/users/{userId}/congress/{congressId}")
+    public ResponseEntity<List<ActivityResponse>> getWorkShopInscriptionByUserAndCongressId(@PathVariable Long userId,@PathVariable Long congressId) throws NotFoundException{
+        List<ActivityResponse> responses = attendanceService.getByUserIdAndCongressId(userId, congressId);
         return ResponseEntity.ok(responses);
     }
 

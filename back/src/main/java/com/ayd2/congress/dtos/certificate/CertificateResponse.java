@@ -14,5 +14,5 @@ public class CertificateResponse {
     private String lastName;
     private LocalDateTime date;
     private String organizationName;
-    
+    private String assitantType;
 }

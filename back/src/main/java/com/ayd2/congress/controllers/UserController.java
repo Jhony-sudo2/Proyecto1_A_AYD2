@@ -23,11 +23,13 @@ import com.ayd2.congress.dtos.User.RecoverPassword;
 import com.ayd2.congress.dtos.User.UpdatePassword;
 import com.ayd2.congress.dtos.User.UserResponse;
 import com.ayd2.congress.dtos.User.UserUpdate;
+import com.ayd2.congress.dtos.certificate.CertificateResponse;
 import com.ayd2.congress.exceptions.CodeAlreadyExpiredException;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotAuthorizedException;
 import com.ayd2.congress.exceptions.NotFoundException;
 import com.ayd2.congress.services.User.UserService;
+import com.ayd2.congress.services.certificate.CertificateService;
 
 import jakarta.validation.Valid;
 
@@ -35,10 +37,12 @@ import jakarta.validation.Valid;
 @RequestMapping("/users")
 public class UserController {
     private final UserService service;
+    private final CertificateService certificateService;
 
     @Autowired
-    public UserController(UserService service) {
+    public UserController(UserService service, CertificateService certificateService) {
         this.service = service;
+        this.certificateService = certificateService;
     }
 
     @PostMapping
@@ -61,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/rols")
-    public ResponseEntity<List<RolResponse>> getAllRols(){
+    public ResponseEntity<List<RolResponse>> getAllRols() {
         List<RolResponse> responses = service.getAllRols();
         return ResponseEntity.ok(responses);
     }
@@ -101,4 +105,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{userId}/congresses/{congressId}/certificates")
+    public ResponseEntity<List<CertificateResponse>> getCertificatesByUserIdAndCongressId(
+            @PathVariable Long userId,
+            @PathVariable Long congressId) throws NotFoundException {
+        List<CertificateResponse> response = certificateService.getCertificatesByUserId(userId, congressId);
+        return ResponseEntity.ok(response);
+    }
 }

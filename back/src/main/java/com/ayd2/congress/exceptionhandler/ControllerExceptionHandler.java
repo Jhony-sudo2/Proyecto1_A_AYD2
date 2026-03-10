@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ayd2.congress.exceptions.ActivityAlreadyEndendException;
+import com.ayd2.congress.exceptions.ActivityFullException;
+import com.ayd2.congress.exceptions.ActivityHasAttendancesException;
 import com.ayd2.congress.exceptions.ActivityNotStartedException;
 import com.ayd2.congress.exceptions.CodeAlreadyExpiredException;
 import com.ayd2.congress.exceptions.CongressNotStartedException;
@@ -95,6 +97,18 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(CodeAlreadyExpiredException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String codeAlreadyExpiredException(CodeAlreadyExpiredException ex) {
+        return ex.getMessage();
+    }
+
+    @ExceptionHandler(ActivityHasAttendancesException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String activityHasAttendancesException(ActivityHasAttendancesException ex) {
+        return ex.getMessage();
+    }
+
+    @ExceptionHandler(ActivityFullException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String activityFullException(ActivityFullException ex) {
         return ex.getMessage();
     }
 

@@ -21,6 +21,7 @@ import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
 import com.ayd2.congress.dtos.acitivty.UpdateActivity;
 import com.ayd2.congress.dtos.acitivty.UpdateProposal;
+import com.ayd2.congress.exceptions.ActivityHasAttendancesException;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.InvalidDateRangeException;
 import com.ayd2.congress.exceptions.NotFoundException;
@@ -58,7 +59,7 @@ public class ActivityController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteActivity(@PathVariable Long id) throws NotFoundException, DuplicatedEntityException, InvalidDateRangeException{
+    public ResponseEntity<Void> deleteActivity(@PathVariable Long id) throws NotFoundException, DuplicatedEntityException, InvalidDateRangeException, ActivityHasAttendancesException{
         activityService.deleteAcivity(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

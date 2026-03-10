@@ -15,6 +15,7 @@ import com.ayd2.congress.dtos.acitivty.NewProposalRequest;
 import com.ayd2.congress.dtos.acitivty.ProposalResponse;
 import com.ayd2.congress.dtos.acitivty.UpdateActivity;
 import com.ayd2.congress.dtos.acitivty.UpdateProposal;
+import com.ayd2.congress.exceptions.ActivityHasAttendancesException;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.InvalidDateRangeException;
 import com.ayd2.congress.exceptions.NotFoundException;
@@ -29,6 +30,7 @@ import com.ayd2.congress.models.Enums.ProposalState;
 import com.ayd2.congress.models.User.UserEntity;
 import com.ayd2.congress.repositories.Activity.ActivityRepository;
 import com.ayd2.congress.repositories.Activity.SpeakerRepository;
+import com.ayd2.congress.repositories.Attendance.AttendanceRepository;
 import com.ayd2.congress.repositories.Attendance.ProposalRepository;
 import com.ayd2.congress.services.Congress.CongressService;
 import com.ayd2.congress.services.Inscription.InscriptionService;
@@ -45,11 +47,12 @@ public class ActivityServiceImpl implements ActivityService {
     private final InscriptionService inscriptionService;
     private final ActivityMapper activityMapper;
     private final SpeakerRepository speakerRepository;
+    private final AttendanceRepository attendanceRepository;
 
     @Autowired
     private ActivityServiceImpl(LocationService locationService, ProposalRepository proposalRepository,
             ActivityRepository activityRepository, CongressService congressService, UserService userService,
-            InscriptionService inscriptionService, ActivityMapper activityMapper, SpeakerRepository speakerRepository) {
+            InscriptionService inscriptionService, ActivityMapper activityMapper, SpeakerRepository speakerRepository,AttendanceRepository attendanceRepository) {
         this.locationService = locationService;
         this.proposalRepository = proposalRepository;
         this.activityRepository = activityRepository;
@@ -58,6 +61,7 @@ public class ActivityServiceImpl implements ActivityService {
         this.activityMapper = activityMapper;
         this.inscriptionService = inscriptionService;
         this.speakerRepository = speakerRepository;
+        this.attendanceRepository = attendanceRepository;
     }
 
     @Override
@@ -90,7 +94,7 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setType(proposal.getType());
         activity.setCongress(congress);
         activityRepository.save(activity);
-        addSpeaker(activity, proposal.getUser());
+        addSpeaker(activity, proposal.getUser(),getRoleIdByProposalType(proposal.getType()));
         proposal.setUsed(true);
         proposalRepository.save(proposal);
         return activityMapper.toActivityResponse(activity);
@@ -120,7 +124,7 @@ public class ActivityServiceImpl implements ActivityService {
         activityEntity.setRoom(room);
         activityEntity.setCongress(congress);
         activityRepository.save(activityEntity);
-        addSpeakers(activityEntity, users);
+        addSpeakers(activityEntity, users,2L);
         return activityMapper.toActivityResponse(activityEntity);
     }
 
@@ -133,10 +137,10 @@ public class ActivityServiceImpl implements ActivityService {
         return users;
     }
 
-    private void addSpeakers(ActivityEntity activityEntity, ArrayList<UserEntity> users)
-            throws DuplicatedEntityException {
+    private void addSpeakers(ActivityEntity activityEntity, ArrayList<UserEntity> users,Long rolId)
+            throws DuplicatedEntityException, NotFoundException {
         for (UserEntity userId : users) {
-            addSpeaker(activityEntity, userId);
+            addSpeaker(activityEntity, userId,rolId);
         }
     }
 
@@ -154,7 +158,7 @@ public class ActivityServiceImpl implements ActivityService {
         return activityMapper.toActivityResponseList(activities);
     }
 
-    private void addSpeaker(ActivityEntity activity, UserEntity user) throws DuplicatedEntityException {
+    private void addSpeaker(ActivityEntity activity, UserEntity user,Long rolId) throws DuplicatedEntityException, NotFoundException {
         SpeakerEntity entity = new SpeakerEntity();
         SpeakerId id = new SpeakerId(activity.getId(), user.getId());
         boolean exists = speakerRepository.existsByUserIdAndActivityId(user.getId(), activity.getId());
@@ -164,8 +168,11 @@ public class ActivityServiceImpl implements ActivityService {
         entity.setActivity(activity);
         entity.setUser(user);
         entity.setId(id);
+        inscriptionService.enroll(user.getId(), rolId, activity.getCongress().getId(), true);
         speakerRepository.save(entity);
     }
+
+
 
     @Override
     public List<ActivityResponse> getActivitiesByTypeAndCongressId(ActivityType type, Long congressId)
@@ -265,8 +272,12 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public void deleteAcivity(Long activityId) throws NotFoundException {
+    public void deleteAcivity(Long activityId) throws NotFoundException, ActivityHasAttendancesException {
+        
         ActivityEntity entity = getActivityById(activityId);
+        if (attendanceRepository.existsByActivityId(activityId)) {
+            throw new ActivityHasAttendancesException("The activity: "+  entity.getName() + " has recorded attendance");
+        }
         activityRepository.delete(entity);
     }
 
