@@ -1,3 +1,3 @@
 export const environemnt = {
-    baseUrl: 'http://18.220.25.172:8080/api/v1'
+    baseUrl: 'https://backdev-bahybed9cfh7brd9.canadacentral-01.azurewebsites.net/api/v1/'
 }
