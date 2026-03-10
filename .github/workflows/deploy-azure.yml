@@ -21,10 +21,9 @@ jobs:
       - name: Compilar proyecto con Maven
         working-directory: back
         run: mvn clean package -DskipTests
-
       - name: Desplegar en Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'backdev'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV}}
           package: '${{ github.workspace }}/back/target/*.jar'
