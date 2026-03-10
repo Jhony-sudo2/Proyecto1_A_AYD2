@@ -147,5 +147,4 @@ public class InscriptionServiceImpl implements InscriptionService{
     }
 
     
-    
 }

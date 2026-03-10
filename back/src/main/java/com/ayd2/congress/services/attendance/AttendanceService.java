@@ -10,11 +10,13 @@ import com.ayd2.congress.exceptions.ActivityNotStartedException;
 import com.ayd2.congress.exceptions.CongressNotStartedException;
 import com.ayd2.congress.exceptions.DuplicatedEntityException;
 import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.models.Attendance.AttendanceEntity;
 
 public interface AttendanceService {
     void createAttendance(NewAttendanceRequest request) throws NotFoundException,DuplicatedEntityException,ActivityFullException,ActivityAlreadyEndendException,CongressNotStartedException,ActivityNotStartedException;
     boolean verifyCapacity(Long activityId) throws NotFoundException,ActivityFullException;
     List<AttendanceResponse> getAttendanceByUserId(Long id) throws NotFoundException;
     List<AttendanceResponse> getAttendanceByActivityId(Long id) throws NotFoundException;
+    List<AttendanceEntity> getAttendanceByUserIdAndCongressId(Long userId,Long congressId) throws NotFoundException;
     boolean isEnrolledInWorkshop(Long userId, Long activityId) throws NotFoundException;
 }

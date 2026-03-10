@@ -14,7 +14,7 @@ public interface InscriptionRepository extends JpaRepository<InscriptionEntity, 
     boolean existsByUserIdAndCongressIdAndAttendeeRolId(Long userId, Long congressId, Long attendeeRolId);
 
     boolean existsByUserIdAndCongressId(Long userId, Long congressId);
-
+    List<InscriptionEntity> findAllByUserIdAndCongressId(Long userId,Long congressId);
     List<InscriptionEntity> findAllByUserId(Long userId);
 
     List<InscriptionEntity> findAllByCongressId(Long congressId);

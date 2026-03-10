@@ -22,6 +22,7 @@ import com.ayd2.congress.models.Enums.ActivityType;
 import com.ayd2.congress.models.Enums.AttendanceType;
 import com.ayd2.congress.models.User.UserEntity;
 import com.ayd2.congress.repositories.Attendance.AttendanceRepository;
+import com.ayd2.congress.services.Congress.CongressService;
 import com.ayd2.congress.services.Inscription.InscriptionService;
 import com.ayd2.congress.services.User.UserService;
 import com.ayd2.congress.services.activity.ActivityService;
@@ -33,14 +34,17 @@ public class AttendanceServiceImpl implements AttendanceService{
     private final UserService userService;
     private final InscriptionService inscriptionService;
     private final AttendanceMapper attendanceMapper;
-
+    private final CongressService congressService;
     @Autowired
-    public AttendanceServiceImpl(ActivityService activityService, AttendanceRepository attendanceRepository, UserService userService, InscriptionService inscriptionService, AttendanceMapper attendanceMapper) {
+    public AttendanceServiceImpl(ActivityService activityService, AttendanceRepository attendanceRepository,
+            UserService userService, InscriptionService inscriptionService, AttendanceMapper attendanceMapper,
+            CongressService congressService) {
         this.activityService = activityService;
         this.attendanceRepository = attendanceRepository;
         this.userService = userService;
         this.inscriptionService = inscriptionService;
         this.attendanceMapper = attendanceMapper;
+        this.congressService = congressService;
     }
     @Override
     public void createAttendance(NewAttendanceRequest request) throws NotFoundException, DuplicatedEntityException, ActivityFullException, ActivityAlreadyEndendException, ActivityNotStartedException, CongressNotStartedException {
@@ -106,6 +110,14 @@ public class AttendanceServiceImpl implements AttendanceService{
         ActivityEntity activity = activityService.getActivityById(activityId);
         if(activity.getType() != ActivityType.WORKSHOP) throw new NotFoundException("Activity is not a workshop");
         return attendanceRepository.existsByActivityIdAndUserIdAndType(activityId, userId, AttendanceType.WORKSHOPINSCRIPTION);
+    }
+    @Override
+    public List<AttendanceEntity> getAttendanceByUserIdAndCongressId(Long userId, Long congressId)
+            throws NotFoundException {
+        userService.getById(userId);
+        congressService.getById(congressId);
+        return attendanceRepository.findAllByUserIdAndCongressIdAndType(userId, congressId, AttendanceType.ATTENDANCE);
+        
     }
     
 }

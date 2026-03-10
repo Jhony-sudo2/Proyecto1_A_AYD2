@@ -18,7 +18,7 @@ import com.ayd2.congress.models.Enums.AttendanceType;
 @Repository
 public interface AttendanceRepository extends JpaRepository<AttendanceEntity, AttendanceId> {
     boolean existsByActivityIdAndUserIdAndType(Long activityId, Long userId, AttendanceType type);
-
+    List<AttendanceEntity> findAllByUserIdAndCongressIdAndType(Long userId,Long congressId,AttendanceType type);
     Long countByActivityIdAndType(Long activityId, AttendanceType type);
 
     List<AttendanceEntity> findByUserId(Long userId);
