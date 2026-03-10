@@ -1,0 +1,115 @@
+package com.ayd2.congress.controllers;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ayd2.congress.dtos.Rol.RolResponse;
+import com.ayd2.congress.dtos.User.ConfirmCode;
+import com.ayd2.congress.dtos.User.NewUserRequest;
+import com.ayd2.congress.dtos.User.RecoverPassword;
+import com.ayd2.congress.dtos.User.UpdatePassword;
+import com.ayd2.congress.dtos.User.UserResponse;
+import com.ayd2.congress.dtos.User.UserUpdate;
+import com.ayd2.congress.dtos.certificate.CertificateResponse;
+import com.ayd2.congress.exceptions.CodeAlreadyExpiredException;
+import com.ayd2.congress.exceptions.DuplicatedEntityException;
+import com.ayd2.congress.exceptions.NotAuthorizedException;
+import com.ayd2.congress.exceptions.NotFoundException;
+import com.ayd2.congress.services.User.UserService;
+import com.ayd2.congress.services.certificate.CertificateService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+    private final UserService service;
+    private final CertificateService certificateService;
+
+    @Autowired
+    public UserController(UserService service, CertificateService certificateService) {
+        this.service = service;
+        this.certificateService = certificateService;
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponse> saveUser(@Valid @RequestBody NewUserRequest request)
+            throws NotFoundException, DuplicatedEntityException, IOException {
+        UserResponse response = service.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        List<UserResponse> responses = service.getAllUsers();
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getById(@Valid @PathVariable Long id) throws NotFoundException {
+        UserResponse response = service.getByIdResponse(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/rols")
+    public ResponseEntity<List<RolResponse>> getAllRols() {
+        List<RolResponse> responses = service.getAllRols();
+        return ResponseEntity.ok(responses);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> update(@Valid @RequestBody UserUpdate userUpdate, @PathVariable Long id)
+            throws NotFoundException, DuplicatedEntityException, IOException {
+        UserResponse response = service.update(userUpdate, id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserResponse> changeState(@PathVariable Long userId) throws NotFoundException {
+        return ResponseEntity.ok(service.changeState(userId));
+    }
+
+    @PutMapping("/{id}/password")
+    public BodyBuilder updatePassword(@Valid @RequestBody UpdatePassword request, @PathVariable Long id)
+            throws NotFoundException, NotAuthorizedException {
+        service.updatePassword(request, id);
+        return ResponseEntity.ok();
+    }
+
+    @PostMapping("/password/recovery")
+    public ResponseEntity<Void> recoverPassword(@Valid @RequestBody RecoverPassword request)
+            throws NotFoundException {
+
+        service.recoverPassword(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/password/confirm")
+    public ResponseEntity<Void> confirmCode(@Valid @RequestBody ConfirmCode request)
+            throws NotFoundException, CodeAlreadyExpiredException {
+
+        service.confirmCode(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{userId}/congresses/{congressId}/certificates")
+    public ResponseEntity<List<CertificateResponse>> getCertificatesByUserIdAndCongressId(
+            @PathVariable Long userId,
+            @PathVariable Long congressId) throws NotFoundException {
+        List<CertificateResponse> response = certificateService.getCertificatesByUserId(userId, congressId);
+        return ResponseEntity.ok(response);
+    }
+}
