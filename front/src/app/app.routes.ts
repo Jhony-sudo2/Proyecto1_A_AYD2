@@ -18,6 +18,7 @@ import { ScientificCommitteeComponent } from './Congress/scientific-committee/sc
 import { ForgotPasswordComponent } from './User/forgot-password/forgot-password.component';
 import { ReportsComponent } from './reports/reports.component';
 import { OrganizationComponent } from './organization/organization.component';
+import { CongressManagementComponent } from './Congress/congress-management/congress-management.component';
 
 export const routes: Routes = [
     {path:'auth/login',component:LoginComponent,title:'Login'},
@@ -29,15 +30,19 @@ export const routes: Routes = [
     {path:'locationRoom/:id',component:CreateRoomsComponent,title:'Administracion de salones'},
     {path:'profile',component:ProfileComponent,title:'Perfil'},
     {path:'activity/proposalCreate/:id',component:CreateProposalComponent,title:'Proponer trabajo'},
-    {path:'activity/create/:id',component:CreateActivityComponent,title:'CrearActividad'},
     {path:'userManager',component:UserManagerComponent,title:'Administrar usuarios'},
+
+
+    {path:'activity/create/:id',component:CreateActivityComponent,title:'CrearActividad'},
     {path:'inscription/:id',component:InscriptionComponent,title:'Inscripcion'},
     {path:'proposalManager/:id',component:ProposalManagerComponent,title:'Adminsitracion de propuestas'},
     {path:'atteendance/:id',component:AttendanceComponent,title:'Manejo de asistencias'},
-    {path:'sysconfiguration',component:SystemConfigComponent,title:'Configuracion del sistema'},
     {path:'scientificCommittee/:id',component:ScientificCommitteeComponent,title:'Administrado comite cientifo'},
+
+    {path:'sysconfiguration',component:SystemConfigComponent,title:'Configuracion del sistema'},
     {path:'forgot-password',component:ForgotPasswordComponent,title:'Recuperar contrasenia'},
     {path:'reports',component:ReportsComponent,title:'Reportes'},
-    {path:'organizations',component:OrganizationComponent,title:'Administracion de organizaciones'}
+    {path:'organizations',component:OrganizationComponent,title:'Administracion de organizaciones'},
+    {path:'congressManagement',component:CongressManagementComponent,title:'Adminsitracion de congresos'}
 
 ];

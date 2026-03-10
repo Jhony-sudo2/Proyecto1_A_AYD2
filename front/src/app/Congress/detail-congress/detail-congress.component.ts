@@ -5,6 +5,7 @@ import { Activity } from '../../interfaces/Activity';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ActivityCardComponent } from '../../Activities/activity-card/activity-card.component';
+import { AuthService } from '../../Services/Auth/auth.service';
 
 @Component({
   selector: 'app-detail-congress',
@@ -16,8 +17,10 @@ export class DetailCongressComponent {
   congressId: number = 0
   congress: CongressResponse = {} as CongressResponse
   activities: Activity[] = []
-  constructor(private servicio: CongressService, private route: ActivatedRoute) { }
+  isLoggedIn: boolean = false
+  constructor(private servicio: CongressService, private route: ActivatedRoute,private authService:AuthService) { }
   ngOnInit() {
+    this.isLoggedIn = this.authService.isLoggedIn()
     this.congressId = parseInt(this.route.snapshot.paramMap.get('id')!)
     this.servicio.getCongressById(this.congressId).subscribe({
       next: (response) => { this.congress = response }
