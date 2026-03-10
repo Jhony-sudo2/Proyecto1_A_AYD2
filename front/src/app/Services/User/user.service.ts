@@ -3,7 +3,7 @@ import { environemnt } from '../../../environment/Environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Organization } from '../../interfaces/Organization';
-import { CreateUser, Rol, UpdatePassword, UpdateUser, User } from '../../interfaces/User';
+import { Certificate, CreateUser, Rol, UpdatePassword, UpdateUser, User } from '../../interfaces/User';
 import { Wallet, WalletRecharge } from '../../interfaces/Wallet';
 
 @Injectable({
@@ -69,5 +69,9 @@ export class UserService {
 
   getAllRols():Observable<Rol[]>{
     return this.http.get<Rol[]>(`${this.baseUrl}/rols`)
+  }
+
+  getCertificates(userId:number,congressId:number):Observable<Certificate[]>{
+    return this.http.get<Certificate[]>(`${this.baseUrl}/${userId}/congresses/${congressId}/certificates`)
   }
 }

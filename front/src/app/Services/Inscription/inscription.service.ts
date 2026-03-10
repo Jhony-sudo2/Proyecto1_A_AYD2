@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environemnt } from '../../../environment/Environment';
-import { Inscription, PayCongress } from '../../interfaces/Inscription';
+import { Inscription, Pay, PayCongress } from '../../interfaces/Inscription';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -17,6 +17,10 @@ export class InscriptionService {
 
   getInscriptionsByUserId(userId:number):Observable<Inscription[]>{
     return this.http.get<Inscription[]>(`${this.baseUrl}/${userId}`)
+  }
+
+  getPaymentsByUserId(userId:number):Observable<Pay[]>{
+    return this.http.get<Pay[]>(`${this.baseUrl}/pay/${userId}`)
   }
 
   

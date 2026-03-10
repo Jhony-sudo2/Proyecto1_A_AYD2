@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environemnt } from '../../../environment/Environment';
 import { Atteendance, CreateAtteendance } from '../../interfaces/Atteendance';
 import { Observable } from 'rxjs';
+import { Activity } from '../../interfaces/Activity';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,10 @@ export class AttendanceService {
 
   getAttendancesByActivity(activityId:number):Observable<Atteendance[]>{
     return this.http.get<Atteendance[]>(`${this.baseUrl}/activities/${activityId}`)
+  }
+
+  getWorkshopInscription(userId:number,congressId:number):Observable<Activity[]>{
+    return this.http.get<Activity[]>(`${this.baseUrl}/users/${userId}/congress/${congressId}`)
   }
 
 

@@ -43,3 +43,15 @@ export interface UpdatePassword{
     currentPassword: string,
     newPassword: string
 }
+
+export interface Certificate {
+  congressName: string;
+  startDate: Date;
+  endDate: Date;
+  locationName: string;
+  name: string;
+  lastName: string;
+  date: Date;
+  organizationName: string;
+  assitantType:String
+}

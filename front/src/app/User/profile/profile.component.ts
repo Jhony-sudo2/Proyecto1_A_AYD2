@@ -6,6 +6,9 @@ import { Wallet, WalletRecharge } from '../../interfaces/Wallet';
 import { UpdatePassword, UpdateUser, User } from '../../interfaces/User';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { InscriptionService } from '../../Services/Inscription/inscription.service';
+import { Pay } from '../../interfaces/Inscription';
+import { Pdf } from '../../Utils/PdfCreator';
 
 @Component({
   selector: 'app-profile',
@@ -16,20 +19,23 @@ import { FormsModule } from '@angular/forms';
 export class ProfileComponent {
   usuario: User = {} as User;
   wallet: Wallet = {} as Wallet
-  usuarioUpadte: UpdateUser = {image:''} as UpdateUser
+  payments: Pay[] = []
+  usuarioUpadte: UpdateUser = { image: '' } as UpdateUser
   updatePassword: UpdatePassword = {} as UpdatePassword
   rechargeWallet: WalletRecharge = {} as WalletRecharge
   historyRecharges: WalletRecharge[] = []
   activeTab: string = 'profile';
   showCurrent: boolean = false;
   showNew: boolean = false;
-
+  pdfUtil: Pdf = new Pdf()
   tabs = [
     { id: 'profile', label: '👤 Perfil' },
     { id: 'password', label: '🔒 Contraseña' },
-    { id: 'wallet', label: '💰 Wallet' }
+    { id: 'wallet', label: '💰 Wallet' },
+    { id: 'payments', label: '🧾 Mis pagos' }
+
   ];
-  constructor(private service: UserService, private authService: AuthService) { }
+  constructor(private service: UserService, private authService: AuthService, private inscriptionService: InscriptionService) { }
 
   ngOnInit() {
     const id = this.authService.getUserId();
@@ -47,6 +53,10 @@ export class ProfileComponent {
       next: (response) => { this.wallet = response },
       error: (err) => Swal.fire({ title: 'Error', text: err.error, icon: 'error' })
     });
+    this.inscriptionService.getPaymentsByUserId(id).subscribe({
+      next: (response) => { this.payments = response },
+      error: (err) => Swal.fire({ title: 'Error', text: err.error, icon: 'error' })
+    })
   }
 
   onImageSelected(event: Event) {
@@ -99,5 +109,10 @@ export class ProfileComponent {
     });
 
   }
-
+  get totalPagado(): number {
+    return this.payments.reduce((s, p) => s + p.total, 0);
+  }
+  descargarComprobante(pay: Pay) {
+    this.pdfUtil.generarPdfPago(pay);
+  }
 }

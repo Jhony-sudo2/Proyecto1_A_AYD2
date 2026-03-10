@@ -27,6 +27,7 @@ export class NavbarComponent {
     { label: 'Congresos', route: '/congress', icon: 'congress', roles: [] },
     { label: 'Mi perfil', route: '/profile', icon: 'profile', roles: [1, 2, 3, 4] },
     { label: 'Registro', route: '/auth/register', icon: 'register', roles: [] },
+    { route: '/myCertificates', label: 'Mis congresos', icon: 'certificate', roles: [1, 2, 3, 4] },
 
     // Normal
     { label: 'Proponer trabajo', route: '/activity/proposalCreate', icon: 'proposal', roles: [3] },
@@ -39,7 +40,7 @@ export class NavbarComponent {
     { label: 'Crear congreso', route: '/congress/create', icon: 'newcongress', roles: [1] },
 
     // Admin congreso
-    { label: 'Gestión congresos', route: '/congressManagement', icon: 'management', roles: [2] },
+    { label: 'Gestión congresos', route: '/congressManagement', icon: 'management', roles: [1,2] },
     { label: 'Reportes', route: '/reports', icon: 'reports', roles: [2] },
     { label: 'Ubicaciones', route: '/Locations', icon: 'location', roles: [1, 2] },
   ];

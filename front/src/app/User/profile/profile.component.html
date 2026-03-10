@@ -244,5 +244,76 @@
       </div>
 
     </div>
+    <!-- Tab Pagos -->
+    <div *ngIf="activeTab === 'payments'">
+
+      <div *ngIf="payments.length === 0" class="text-center py-16 text-slate-600">
+        <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" stroke-width="1.5"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+        </svg>
+        <p>No tienes pagos registrados</p>
+      </div>
+
+      <div class="space-y-3">
+        <div *ngFor="let pay of payments"
+          class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all duration-200">
+
+          <div class="flex items-start justify-between gap-4">
+
+            <!-- Info congreso -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <p class="text-white font-bold truncate">{{ pay.congressName }}</p>
+              </div>
+              <p class="text-slate-500 text-xs ml-4">ID pago #{{ pay.id }}</p>
+            </div>
+
+            <!-- Monto -->
+            <div class="text-right shrink-0">
+              <p class="text-emerald-400 font-bold text-lg">Q{{ pay.total | number:'1.2-2' }}</p>
+              <p class="text-slate-500 text-xs">{{ pay.date | date:'dd MMM yyyy, HH:mm' }}</p>
+            </div>
+
+          </div>
+
+          <!-- Divider -->
+          <div class="h-px bg-slate-800 my-3"></div>
+
+          <!-- Detalles -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-slate-800 rounded-xl px-3 py-2">
+              <p class="text-slate-500 text-xs mb-0.5">Participante</p>
+              <p class="text-white text-sm font-semibold truncate">{{ pay.userName }}</p>
+            </div>
+            <div class="bg-slate-800 rounded-xl px-3 py-2">
+              <p class="text-slate-500 text-xs mb-0.5">Congreso ID</p>
+              <p class="text-white text-sm font-semibold">#{{ pay.congressId }}</p>
+            </div>
+          </div>
+          <button (click)="descargarComprobante(pay)"
+            class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 shadow-md shadow-sky-500/20 active:scale-95 transition-all duration-200">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Comprobante PDF
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Total pagado -->
+      <div *ngIf="payments.length > 0"
+        class="mt-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+        <p class="text-slate-400 text-sm">Total pagado</p>
+        <p class="text-white font-bold text-xl">
+          Q{{ totalPagado | number:'1.2-2' }}
+        </p>
+      </div>
+
+    </div>
   </div>
 </div>

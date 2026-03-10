@@ -1,3 +1,3 @@
 export const environemnt = {
-    baseUrl: 'http://localhost:8080/api/v1'
+    baseUrl: 'http://18.220.25.172:8080/api/v1'
 }
